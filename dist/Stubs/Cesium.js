@@ -374,6 +374,10 @@ define('Core/Occluder', function() {
     return Cesium['Occluder'];
 });
 
+define('Core/OrientedBoundingBox', function() {
+    return Cesium['OrientedBoundingBox'];
+});
+
 define('Core/Packable', function() {
     return Cesium['Packable'];
 });
@@ -1664,6 +1668,10 @@ define('Scene/TileTerrain', function() {
 
 define('Scene/TweenCollection', function() {
     return Cesium['TweenCollection'];
+});
+
+define('Scene/UrlTemplateImageryProvider', function() {
+    return Cesium['UrlTemplateImageryProvider'];
 });
 
 define('Scene/VerticalOrigin', function() {
