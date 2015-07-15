@@ -1,0 +1,25 @@
+{
+  "name": "cesium",
+  "version": "1.10.0",
+  "homepage": "http://cesiumjs.org",
+  "authors": [
+    "Analytical Graphics Inc.",
+    "Dmitriy Pushkov <ezze@ezze.org>"
+  ],
+  "description": "JavaScript library for creating 3D globes and 2D maps in a web browser without a plugin",
+  "main": "dist/Cesium/Cesium.js",
+  "moduleType": [
+    "amd"
+  ],
+  "keywords": [
+    "3d",
+    "globe",
+    "earth",
+    "javascript",
+    "webgl"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "cesium"
+  ]
+}

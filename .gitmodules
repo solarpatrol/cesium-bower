@@ -1,0 +1,3 @@
+[submodule "cesium"]
+	path = cesium
+	url = git@github.com:solarpatrol/cesium
