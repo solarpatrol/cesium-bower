@@ -346,6 +346,10 @@ define('Core/MapProjection', function() {
     return Cesium['MapProjection'];
 });
 
+define('Core/MapboxApi', function() {
+    return Cesium['MapboxApi'];
+});
+
 define('Core/Math', function() {
     return Cesium['Math'];
 });
@@ -364,10 +368,6 @@ define('Core/Matrix4', function() {
 
 define('Core/NearFarScalar', function() {
     return Cesium['NearFarScalar'];
-});
-
-define('Core/ObjectOrientedBoundingBox', function() {
-    return Cesium['ObjectOrientedBoundingBox'];
 });
 
 define('Core/Occluder', function() {
@@ -1318,6 +1318,10 @@ define('Scene/DepthFunction', function() {
     return Cesium['DepthFunction'];
 });
 
+define('Scene/DepthPlane', function() {
+    return Cesium['DepthPlane'];
+});
+
 define('Scene/DiscardMissingTileImagePolicy', function() {
     return Cesium['DiscardMissingTileImagePolicy'];
 });
@@ -1424,6 +1428,10 @@ define('Scene/LabelCollection', function() {
 
 define('Scene/LabelStyle', function() {
     return Cesium['LabelStyle'];
+});
+
+define('Scene/MapboxImageryProvider', function() {
+    return Cesium['MapboxImageryProvider'];
 });
 
 define('Scene/Material', function() {
@@ -2074,6 +2082,14 @@ define('Shaders/CompositeOITFS', function() {
     return Cesium['CompositeOITFS'];
 });
 
+define('Shaders/DepthPlaneFS', function() {
+    return Cesium['DepthPlaneFS'];
+});
+
+define('Shaders/DepthPlaneVS', function() {
+    return Cesium['DepthPlaneVS'];
+});
+
 define('Shaders/EllipsoidFS', function() {
     return Cesium['EllipsoidFS'];
 });
@@ -2086,20 +2102,12 @@ define('Shaders/GlobeFS', function() {
     return Cesium['GlobeFS'];
 });
 
-define('Shaders/GlobeFSDepth', function() {
-    return Cesium['GlobeFSDepth'];
-});
-
 define('Shaders/GlobeFSPole', function() {
     return Cesium['GlobeFSPole'];
 });
 
 define('Shaders/GlobeVS', function() {
     return Cesium['GlobeVS'];
-});
-
-define('Shaders/GlobeVSDepth', function() {
-    return Cesium['GlobeVSDepth'];
 });
 
 define('Shaders/GlobeVSPole', function() {
