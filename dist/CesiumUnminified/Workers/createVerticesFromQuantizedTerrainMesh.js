@@ -26,9 +26,10 @@ define('Core/defined',[],function() {
     "use strict";
 
     /**
-     * Returns true if the object is defined, returns false otherwise.
-     *
      * @exports defined
+     *
+     * @param {Object} value The object.
+     * @returns {Boolean} Returns true if the object is defined, returns false otherwise.
      *
      * @example
      * if (Cesium.defined(positions)) {
@@ -81,6 +82,10 @@ define('Core/defaultValue',[
      * Useful for setting a default value for a parameter.
      *
      * @exports defaultValue
+     *
+     * @param {*} a
+     * @param {*} b
+     * @returns {*} Returns the first parameter if not undefined, otherwise the second parameter.
      *
      * @example
      * param = Cesium.defaultValue(param, 'default');
@@ -639,7 +644,7 @@ define('Core/Math',[
      *</p>
      *
      * @param {Number} value The number whose hyperbolic sine is to be returned.
-     * @returns The hyperbolic sine of <code>value</code>.
+     * @returns {Number} The hyperbolic sine of <code>value</code>.
      */
     CesiumMath.sinh = function(value) {
         var part1 = Math.pow(Math.E, value);
@@ -665,7 +670,7 @@ define('Core/Math',[
      *</p>
      *
      * @param {Number} value The number whose hyperbolic cosine is to be returned.
-     * @returns The hyperbolic cosine of <code>value</code>.
+     * @returns {Number} The hyperbolic cosine of <code>value</code>.
      */
     CesiumMath.cosh = function(value) {
         var part1 = Math.pow(Math.E, value);
@@ -1192,6 +1197,7 @@ define('Core/Cartesian2',[
      * @param {Number[]} array The packed array.
      * @param {Number} [startingIndex=0] The starting index of the element to be unpacked.
      * @param {Cartesian2} [result] The object into which to store the result.
+     * @returns {Cartesian2} The modified result parameter or a new Cartesian2 instance if one was not provided.
      */
     Cartesian2.unpack = function(array, startingIndex, result) {
         
@@ -1791,6 +1797,7 @@ define('Core/Cartesian3',[
      * @param {Number[]} array The packed array.
      * @param {Number} [startingIndex=0] The starting index of the element to be unpacked.
      * @param {Cartesian3} [result] The object into which to store the result.
+     * @returns {Cartesian3} The modified result parameter or a new Cartesian3 instance if one was not provided.
      */
     Cartesian3.unpack = function(array, startingIndex, result) {
         
@@ -3007,6 +3014,7 @@ define('Core/Ellipsoid',[
          * Gets the radii of the ellipsoid.
          * @memberof Ellipsoid.prototype
          * @type {Cartesian3}
+         * @readonly
          */
         radii : {
             get: function() {
@@ -3017,6 +3025,7 @@ define('Core/Ellipsoid',[
          * Gets the squared radii of the ellipsoid.
          * @memberof Ellipsoid.prototype
          * @type {Cartesian3}
+         * @readonly
          */
         radiiSquared : {
             get : function() {
@@ -3027,6 +3036,7 @@ define('Core/Ellipsoid',[
          * Gets the radii of the ellipsoid raise to the fourth power.
          * @memberof Ellipsoid.prototype
          * @type {Cartesian3}
+         * @readonly
          */
         radiiToTheFourth : {
             get : function() {
@@ -3037,6 +3047,7 @@ define('Core/Ellipsoid',[
          * Gets one over the radii of the ellipsoid.
          * @memberof Ellipsoid.prototype
          * @type {Cartesian3}
+         * @readonly
          */
         oneOverRadii : {
             get : function() {
@@ -3047,6 +3058,7 @@ define('Core/Ellipsoid',[
          * Gets one over the squared radii of the ellipsoid.
          * @memberof Ellipsoid.prototype
          * @type {Cartesian3}
+         * @readonly
          */
         oneOverRadiiSquared : {
             get : function() {
@@ -3057,6 +3069,7 @@ define('Core/Ellipsoid',[
          * Gets the minimum radius of the ellipsoid.
          * @memberof Ellipsoid.prototype
          * @type {Number}
+         * @readonly
          */
         minimumRadius : {
             get : function() {
@@ -3067,6 +3080,7 @@ define('Core/Ellipsoid',[
          * Gets the maximum radius of the ellipsoid.
          * @memberof Ellipsoid.prototype
          * @type {Number}
+         * @readonly
          */
         maximumRadius : {
             get : function() {
@@ -3174,7 +3188,7 @@ define('Core/Ellipsoid',[
      * Stores the provided instance into the provided array.
      * @function
      *
-     * @param {Object} value The value to pack.
+     * @param {Ellipsoid} value The value to pack.
      * @param {Number[]} array The array to pack into.
      * @param {Number} [startingIndex=0] The index into the array at which to start packing the elements.
      */
@@ -3191,6 +3205,7 @@ define('Core/Ellipsoid',[
      * @param {Number[]} array The packed array.
      * @param {Number} [startingIndex=0] The starting index of the element to be unpacked.
      * @param {Ellipsoid} [result] The object into which to store the result.
+     * @returns {Ellipsoid} The modified result parameter or a new Ellipsoid instance if one was not provided.
      */
     Ellipsoid.unpack = function(array, startingIndex, result) {
         
@@ -3293,7 +3308,7 @@ define('Core/Ellipsoid',[
      * //Convert an array of Cartographics and determine their Cartesian representation on a WGS84 ellipsoid.
      * var positions = [new Cesium.Cartographic(Cesium.Math.toRadians(21), Cesium.Math.toRadians(78), 0),
      *                  new Cesium.Cartographic(Cesium.Math.toRadians(21.321), Cesium.Math.toRadians(78.123), 100),
-     *                  new Cesium.Cartographic(Cesium.Math.toRadians(21.645), Cesium.Math.toRadians(78.456), 250)
+     *                  new Cesium.Cartographic(Cesium.Math.toRadians(21.645), Cesium.Math.toRadians(78.456), 250)];
      * var cartesianPositions = Cesium.Ellipsoid.WGS84.cartographicArrayToCartesianArray(positions);
      */
     Ellipsoid.prototype.cartographicArrayToCartesianArray = function(cartographics, result) {
@@ -3324,7 +3339,7 @@ define('Core/Ellipsoid',[
      *
      * @example
      * //Create a Cartesian and determine it's Cartographic representation on a WGS84 ellipsoid.
-     * var position = new Cesium.Cartesian(17832.12, 83234.52, 952313.73);
+     * var position = new Cesium.Cartesian3(17832.12, 83234.52, 952313.73);
      * var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
      */
     Ellipsoid.prototype.cartesianToCartographic = function(cartesian, result) {
@@ -3837,7 +3852,7 @@ define('Workers/createTaskProcessorWorker',[
      * @example
      * function calculate(parameters, transferableObjects) {
      *   // perform whatever calculation is necessary.
-     *   var typedArray = new Float32Array();
+     *   var typedArray = new Float32Array(0);
      *
      *   // typed arrays are transferable
      *   transferableObjects.push(typedArray)
