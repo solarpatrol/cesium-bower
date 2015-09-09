@@ -1146,6 +1146,10 @@ define('Renderer/Context', function() {
     return Cesium['Context'];
 });
 
+define('Renderer/ContextLimits', function() {
+    return Cesium['ContextLimits'];
+});
+
 define('Renderer/CubeMap', function() {
     return Cesium['CubeMap'];
 });
@@ -1188,6 +1192,10 @@ define('Renderer/Renderbuffer', function() {
 
 define('Renderer/RenderbufferFormat', function() {
     return Cesium['RenderbufferFormat'];
+});
+
+define('Renderer/Sampler', function() {
+    return Cesium['Sampler'];
 });
 
 define('Renderer/ShaderCache', function() {
@@ -1380,6 +1388,10 @@ define('Scene/GoogleEarthImageryProvider', function() {
 
 define('Scene/GridImageryProvider', function() {
     return Cesium['GridImageryProvider'];
+});
+
+define('Scene/GroundPrimitive', function() {
+    return Cesium['GroundPrimitive'];
 });
 
 define('Scene/HeadingPitchRange', function() {
@@ -2208,6 +2220,14 @@ define('Shaders/ReprojectWebMercatorFS', function() {
 
 define('Shaders/ReprojectWebMercatorVS', function() {
     return Cesium['ReprojectWebMercatorVS'];
+});
+
+define('Shaders/ShadowVolumeFS', function() {
+    return Cesium['ShadowVolumeFS'];
+});
+
+define('Shaders/ShadowVolumeVS', function() {
+    return Cesium['ShadowVolumeVS'];
 });
 
 define('Shaders/SkyAtmosphereFS', function() {
