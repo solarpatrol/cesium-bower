@@ -11,3 +11,7 @@ with original `minifyRelease` Ant target under `dist` directory.
 In order to install Cesium with Bower run:
 
     bower install cesium.js
+
+## Contribution
+
+Before making a pull request, please, be sure that your changes are rebased to `dev` branch.
