@@ -30,12 +30,23 @@ const float SHIFT_RIGHT5 = 1.0 / 32.0;\n\
 const float SHIFT_RIGHT3 = 1.0 / 8.0;\n\
 const float SHIFT_RIGHT2 = 1.0 / 4.0;\n\
 const float SHIFT_RIGHT1 = 1.0 / 2.0;\n\
-vec4 computePositionWindowCoordinates(vec4 positionEC, vec2 imageSize, float scale, vec2 direction, vec2 origin, vec2 translate, vec2 pixelOffset, vec3 alignedAxis, float rotation)\n\
+vec4 computePositionWindowCoordinates(vec4 positionEC, vec2 imageSize, float scale, vec2 direction, vec2 origin, vec2 translate, vec2 pixelOffset, vec3 alignedAxis, float rotation, bool sizeInMeters)\n\
 {\n\
-vec4 positionWC = czm_eyeToWindowCoordinates(positionEC);\n\
 vec2 halfSize = imageSize * scale * czm_resolutionScale;\n\
 halfSize *= ((direction * 2.0) - 1.0);\n\
+if (sizeInMeters)\n\
+{\n\
+positionEC.xy += halfSize;\n\
+}\n\
+vec4 positionWC = czm_eyeToWindowCoordinates(positionEC);\n\
+if (sizeInMeters)\n\
+{\n\
+positionWC.xy += (origin * abs(halfSize)) / czm_metersPerPixel(positionEC);\n\
+}\n\
+else\n\
+{\n\
 positionWC.xy += (origin * abs(halfSize));\n\
+}\n\
 #if defined(ROTATION) || defined(ALIGNED_AXIS)\n\
 if (!all(equal(alignedAxis, vec3(0.0))) || rotation != 0.0)\n\
 {\n\
@@ -54,7 +65,10 @@ mat2 rotationMatrix = mat2(cosTheta, sinTheta, -sinTheta, cosTheta);\n\
 halfSize = rotationMatrix * halfSize;\n\
 }\n\
 #endif\n\
+if (!sizeInMeters)\n\
+{\n\
 positionWC.xy += halfSize;\n\
+}\n\
 positionWC.xy += translate;\n\
 positionWC.xy += (pixelOffset * czm_resolutionScale);\n\
 return positionWC;\n\
@@ -121,6 +135,8 @@ temp = floor(temp) * SHIFT_RIGHT8;\n\
 color.g = (temp - floor(temp)) * SHIFT_LEFT8;\n\
 color.r = floor(temp);\n\
 temp = compressedAttribute2.z * SHIFT_RIGHT8;\n\
+bool sizeInMeters = (temp - floor(temp)) * SHIFT_LEFT8 > 0.0;\n\
+temp = floor(temp) * SHIFT_RIGHT8;\n\
 #ifdef RENDER_FOR_PICK\n\
 color.a = (temp - floor(temp)) * SHIFT_LEFT8;\n\
 vec4 pickColor = color / 255.0;\n\
@@ -166,7 +182,7 @@ pixelOffset *= pixelOffsetScale;\n\
 positionEC.z *= 0.995;\n\
 origin.y = 1.0;\n\
 #endif\n\
-vec4 positionWC = computePositionWindowCoordinates(positionEC, imageSize, scale, direction, origin, translate, pixelOffset, alignedAxis, rotation);\n\
+vec4 positionWC = computePositionWindowCoordinates(positionEC, imageSize, scale, direction, origin, translate, pixelOffset, alignedAxis, rotation, sizeInMeters);\n\
 gl_Position = czm_viewportOrthographic * vec4(positionWC.xy, -positionWC.z, 1.0);\n\
 v_textureCoordinates = textureCoordinates;\n\
 #ifdef RENDER_FOR_PICK\n\
