@@ -35,6 +35,8 @@
     "use strict";
     return "const float g = -0.95;\n\
 const float g2 = g * g;\n\
+uniform float fCameraHeight;\n\
+uniform float fInnerRadius;\n\
 varying vec3 v_rayleighColor;\n\
 varying vec3 v_mieColor;\n\
 varying vec3 v_toCamera;\n\
@@ -44,9 +46,27 @@ void main (void)\n\
 czm_ellipsoid ellipsoid = czm_getWgs84EllipsoidEC();\n\
 vec3 direction = normalize(v_positionEC);\n\
 czm_ray ray = czm_ray(vec3(0.0), direction);\n\
+if (fCameraHeight > fInnerRadius) {\n\
 czm_raySegment intersection = czm_rayEllipsoidIntersectionInterval(ray, ellipsoid);\n\
 if (!czm_isEmpty(intersection)) {\n\
 discard;\n\
+}\n\
+} else {\n\
+vec3 radii = ellipsoid.radii;\n\
+float maxRadius = max(radii.x, max(radii.y, radii.z));\n\
+vec3 ellipsoidCenter = czm_modelView[3].xyz;\n\
+float t1 = -1.0;\n\
+float t2 = -1.0;\n\
+float b = -2.0 * dot(direction, ellipsoidCenter);\n\
+float c = dot(ellipsoidCenter, ellipsoidCenter) - maxRadius * maxRadius;\n\
+float discriminant = b * b - 4.0 * c;\n\
+if (discriminant >= 0.0) {\n\
+t1 = (-b - sqrt(discriminant)) * 0.5;\n\
+t2 = (-b + sqrt(discriminant)) * 0.5;\n\
+}\n\
+if (t1 < 0.0 && t2 < 0.0) {\n\
+discard;\n\
+}\n\
 }\n\
 float fCos = dot(czm_sunDirectionWC, normalize(v_toCamera)) / length(v_toCamera);\n\
 float fRayleighPhase = 0.75 * (1.0 + fCos*fCos);\n\

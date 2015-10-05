@@ -1,13 +1,16 @@
 {
   "name": "cesium.js",
-  "version": "1.13.0",
+  "version": "1.14.0",
   "homepage": "http://cesiumjs.org",
   "authors": [
     "Analytical Graphics Inc.",
     "Dmitriy Pushkov <ezze@ezze.org>"
   ],
   "description": "JavaScript library for creating 3D globes and 2D maps in a web browser without a plugin",
-  "main": "dist/Cesium/Cesium.js",
+  "main": [
+    "dist/Cesium/Cesium.js",
+    "dist/Cesium/Widgets/widgets.css"
+  ],
   "moduleType": [
     "amd"
   ],

@@ -1142,6 +1142,14 @@ define('Renderer/ClearCommand', function() {
     return Cesium['ClearCommand'];
 });
 
+define('Renderer/ComputeCommand', function() {
+    return Cesium['ComputeCommand'];
+});
+
+define('Renderer/ComputeEngine', function() {
+    return Cesium['ComputeEngine'];
+});
+
 define('Renderer/Context', function() {
     return Cesium['Context'];
 });
@@ -1236,6 +1244,10 @@ define('Renderer/VertexArray', function() {
 
 define('Renderer/VertexArrayFacade', function() {
     return Cesium['VertexArrayFacade'];
+});
+
+define('Renderer/WebGLConstants', function() {
+    return Cesium['WebGLConstants'];
 });
 
 define('Renderer/createUniform', function() {
@@ -2000,6 +2012,10 @@ define('Shaders/Builtin/Functions/latitudeToWebMercatorFraction', function() {
 
 define('Shaders/Builtin/Functions/luminance', function() {
     return Cesium['luminance'];
+});
+
+define('Shaders/Builtin/Functions/metersPerPixel', function() {
+    return Cesium['metersPerPixel'];
 });
 
 define('Shaders/Builtin/Functions/modelToWindowCoordinates', function() {
