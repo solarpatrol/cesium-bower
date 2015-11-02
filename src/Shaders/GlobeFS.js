@@ -1,6 +1,6 @@
-    //This file is automatically rebuilt by the Cesium build process.
-    /*global define*/
-    define(function() {
+//This file is automatically rebuilt by the Cesium build process.
+/*global define*/
+define(function() {
     "use strict";
     return "uniform vec4 u_initialColor;\n\
 #if TEXTURE_UNITS > 0\n\
@@ -62,9 +62,9 @@ textureAlpha = textureAlpha * alphaMultiplier.x * alphaMultiplier.y;\n\
 vec2 translation = textureCoordinateTranslationAndScale.xy;\n\
 vec2 scale = textureCoordinateTranslationAndScale.zw;\n\
 vec2 textureCoordinates = tileTextureCoordinates * scale + translation;\n\
-vec4 sample = texture2D(texture, textureCoordinates);\n\
-vec3 color = sample.rgb;\n\
-float alpha = sample.a;\n\
+vec4 value = texture2D(texture, textureCoordinates);\n\
+vec3 color = value.rgb;\n\
+float alpha = value.a;\n\
 #ifdef APPLY_BRIGHTNESS\n\
 color = mix(vec3(0.0), color, textureBrightness);\n\
 #endif\n\

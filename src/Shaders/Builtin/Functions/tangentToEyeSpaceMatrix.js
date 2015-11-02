@@ -1,6 +1,6 @@
-    //This file is automatically rebuilt by the Cesium build process.
-    /*global define*/
-    define(function() {
+//This file is automatically rebuilt by the Cesium build process.
+/*global define*/
+define(function() {
     "use strict";
     return "mat3 czm_tangentToEyeSpaceMatrix(vec3 normalEC, vec3 tangentEC, vec3 binormalEC)\n\
 {\n\

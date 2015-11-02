@@ -1,6 +1,6 @@
-    //This file is automatically rebuilt by the Cesium build process.
-    /*global define*/
-    define(function() {
+//This file is automatically rebuilt by the Cesium build process.
+/*global define*/
+define(function() {
     "use strict";
     return "vec4 czm_translucentPhong(vec3 toEye, czm_material material)\n\
 {\n\

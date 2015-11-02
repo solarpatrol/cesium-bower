@@ -1,6 +1,6 @@
-    //This file is automatically rebuilt by the Cesium build process.
-    /*global define*/
-    define(function() {
+//This file is automatically rebuilt by the Cesium build process.
+/*global define*/
+define(function() {
     "use strict";
     return "vec3 czm_hue(vec3 rgb, float adjustment)\n\
 {\n\
