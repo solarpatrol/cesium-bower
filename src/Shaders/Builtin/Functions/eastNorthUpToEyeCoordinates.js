@@ -1,6 +1,6 @@
-    //This file is automatically rebuilt by the Cesium build process.
-    /*global define*/
-    define(function() {
+//This file is automatically rebuilt by the Cesium build process.
+/*global define*/
+define(function() {
     "use strict";
     return "mat3 czm_eastNorthUpToEyeCoordinates(vec3 positionMC, vec3 normalEC)\n\
 {\n\

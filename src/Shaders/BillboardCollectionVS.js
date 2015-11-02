@@ -1,13 +1,16 @@
-    //This file is automatically rebuilt by the Cesium build process.
-    /*global define*/
-    define(function() {
+//This file is automatically rebuilt by the Cesium build process.
+/*global define*/
+define(function() {
     "use strict";
-    return "attribute vec4 positionHighAndScale;\n\
+    return "#ifdef INSTANCED\n\
+attribute vec2 direction;\n\
+#endif\n\
+attribute vec4 positionHighAndScale;\n\
 attribute vec4 positionLowAndRotation;\n\
 attribute vec4 compressedAttribute0;\n\
 attribute vec4 compressedAttribute1;\n\
 attribute vec4 compressedAttribute2;\n\
-attribute vec3 eyeOffset;\n\
+attribute vec4 eyeOffset;\n\
 attribute vec4 scaleByDistance;\n\
 attribute vec4 pixelOffsetScaleByDistance;\n\
 varying vec2 v_textureCoordinates;\n\
@@ -96,9 +99,16 @@ compressed -= origin.y * SHIFT_LEFT3;\n\
 origin -= vec2(1.0);\n\
 float show = floor(compressed * SHIFT_RIGHT2);\n\
 compressed -= show * SHIFT_LEFT2;\n\
+#ifdef INSTANCED\n\
+vec2 textureCoordinatesBottomLeft = czm_decompressTextureCoordinates(compressedAttribute0.w);\n\
+vec2 textureCoordinatesRange = czm_decompressTextureCoordinates(eyeOffset.w);\n\
+vec2 textureCoordinates = textureCoordinatesBottomLeft + direction * textureCoordinatesRange;\n\
+#else\n\
 vec2 direction;\n\
 direction.x = floor(compressed * SHIFT_RIGHT1);\n\
 direction.y = compressed - direction.x * SHIFT_LEFT1;\n\
+vec2 textureCoordinates = czm_decompressTextureCoordinates(compressedAttribute0.w);\n\
+#endif\n\
 float temp = compressedAttribute0.y  * SHIFT_RIGHT8;\n\
 pixelOffset.y = -(floor(temp) - UPPER_BOUND);\n\
 vec2 translate;\n\
@@ -107,7 +117,6 @@ temp = compressedAttribute0.z * SHIFT_RIGHT8;\n\
 translate.x = floor(temp) - UPPER_BOUND;\n\
 translate.y += (temp - floor(temp)) * SHIFT_LEFT8;\n\
 translate.y -= UPPER_BOUND;\n\
-vec2 textureCoordinates = czm_decompressTextureCoordinates(compressedAttribute0.w);\n\
 temp = compressedAttribute1.x * SHIFT_RIGHT8;\n\
 vec2 imageSize = vec2(floor(temp), compressedAttribute2.w);\n\
 #ifdef EYE_DISTANCE_TRANSLUCENCY\n\
@@ -146,7 +155,7 @@ color /= 255.0;\n\
 #endif\n\
 vec4 p = czm_translateRelativeToEye(positionHigh, positionLow);\n\
 vec4 positionEC = czm_modelViewRelativeToEye * p;\n\
-positionEC = czm_eyeOffset(positionEC, eyeOffset);\n\
+positionEC = czm_eyeOffset(positionEC, eyeOffset.xyz);\n\
 positionEC.xyz *= show;\n\
 #if defined(EYE_DISTANCE_SCALING) || defined(EYE_DISTANCE_TRANSLUCENCY) || defined(EYE_DISTANCE_PIXEL_OFFSET)\n\
 float lengthSq;\n\

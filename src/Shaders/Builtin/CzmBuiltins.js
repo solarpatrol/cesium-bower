@@ -152,8 +152,8 @@ define([
         czm_transpose,
         czm_unpackDepth,
         czm_windowToEyeCoordinates) {
-    "use strict";
-    return {
+                           "use strict";
+                           return {
         czm_degreesPerRadian : czm_degreesPerRadian,
         czm_depthRange : czm_depthRange,
         czm_epsilon1 : czm_epsilon1,

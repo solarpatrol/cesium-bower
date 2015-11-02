@@ -254,6 +254,10 @@ define('Core/GregorianDate', function() {
     return Cesium['GregorianDate'];
 });
 
+define('Core/HeadingPitchRange', function() {
+    return Cesium['HeadingPitchRange'];
+});
+
 define('Core/HeightmapTerrainData', function() {
     return Cesium['HeightmapTerrainData'];
 });
@@ -714,6 +718,10 @@ define('Core/isLeapYear', function() {
     return Cesium['isLeapYear'];
 });
 
+define('Core/joinUrls', function() {
+    return Cesium['joinUrls'];
+});
+
 define('Core/jsonp', function() {
     return Cesium['jsonp'];
 });
@@ -740,6 +748,10 @@ define('Core/loadImageViaBlob', function() {
 
 define('Core/loadJson', function() {
     return Cesium['loadJson'];
+});
+
+define('Core/loadJsonp', function() {
+    return Cesium['loadJsonp'];
 });
 
 define('Core/loadText', function() {
@@ -1728,6 +1740,10 @@ define('Scene/createTangentSpaceDebugPrimitive', function() {
 
 define('Scene/getModelAccessor', function() {
     return Cesium['getModelAccessor'];
+});
+
+define('Scene/modelMaterialsCommon', function() {
+    return Cesium['modelMaterialsCommon'];
 });
 
 define('Scene/terrainAttributeLocations', function() {
