@@ -14,6 +14,11 @@ varying vec3 v_positionEC;\n\
 varying vec2 v_textureCoordinates;\n\
 varying vec3 v_normalMC;\n\
 varying vec3 v_normalEC;\n\
+#ifdef FOG\n\
+varying float v_distance;\n\
+varying vec3 v_mieColor;\n\
+varying vec3 v_rayleighColor;\n\
+#endif\n\
 vec4 getPosition(vec3 position3DWC);\n\
 float get2DYPositionFraction();\n\
 vec4 getPosition3DMode(vec3 position3DWC)\n\
@@ -76,6 +81,12 @@ v_positionEC = (czm_modelView3D * vec4(position3DWC, 1.0)).xyz;\n\
 v_positionMC = position3DWC;\n\
 #endif\n\
 v_textureCoordinates = textureCoordAndEncodedNormals.xy;\n\
+#ifdef FOG\n\
+AtmosphereColor atmosColor = computeGroundAtmosphereFromSpace(position3DWC);\n\
+v_mieColor = atmosColor.mie;\n\
+v_rayleighColor = atmosColor.rayleigh;\n\
+v_distance = length((czm_modelView3D * vec4(position3DWC, 1.0)).xyz);\n\
+#endif\n\
 }\n\
 ";
 });
