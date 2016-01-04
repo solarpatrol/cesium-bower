@@ -550,12 +550,20 @@ define('Core/TerrainData', function() {
     return Cesium['TerrainData'];
 });
 
+define('Core/TerrainEncoding', function() {
+    return Cesium['TerrainEncoding'];
+});
+
 define('Core/TerrainMesh', function() {
     return Cesium['TerrainMesh'];
 });
 
 define('Core/TerrainProvider', function() {
     return Cesium['TerrainProvider'];
+});
+
+define('Core/TerrainQuantization', function() {
+    return Cesium['TerrainQuantization'];
 });
 
 define('Core/TileProviderError', function() {
@@ -588,6 +596,10 @@ define('Core/Tipsify', function() {
 
 define('Core/Transforms', function() {
     return Cesium['Transforms'];
+});
+
+define('Core/TranslationRotationScale', function() {
+    return Cesium['TranslationRotationScale'];
 });
 
 define('Core/TridiagonalSystemSolver', function() {
@@ -736,10 +748,6 @@ define('Core/isLeapYear', function() {
 
 define('Core/joinUrls', function() {
     return Cesium['joinUrls'];
-});
-
-define('Core/jsonp', function() {
-    return Cesium['jsonp'];
 });
 
 define('Core/loadArrayBuffer', function() {
@@ -1002,6 +1010,10 @@ define('DataSources/ModelVisualizer', function() {
     return Cesium['ModelVisualizer'];
 });
 
+define('DataSources/NodeTransformationProperty', function() {
+    return Cesium['NodeTransformationProperty'];
+});
+
 define('DataSources/PathGraphics', function() {
     return Cesium['PathGraphics'];
 });
@@ -1068,6 +1080,10 @@ define('DataSources/Property', function() {
 
 define('DataSources/PropertyArray', function() {
     return Cesium['PropertyArray'];
+});
+
+define('DataSources/PropertyBag', function() {
+    return Cesium['PropertyBag'];
 });
 
 define('DataSources/RectangleGeometryUpdater', function() {
@@ -1442,10 +1458,6 @@ define('Scene/GroundPrimitive', function() {
     return Cesium['GroundPrimitive'];
 });
 
-define('Scene/HeadingPitchRange', function() {
-    return Cesium['HeadingPitchRange'];
-});
-
 define('Scene/HeightReference', function() {
     return Cesium['HeightReference'];
 });
@@ -1594,10 +1606,6 @@ define('Scene/PointPrimitiveCollection', function() {
     return Cesium['PointPrimitiveCollection'];
 });
 
-define('Scene/Polygon', function() {
-    return Cesium['Polygon'];
-});
-
 define('Scene/Polyline', function() {
     return Cesium['Polyline'];
 });
@@ -1648,10 +1656,6 @@ define('Scene/QuadtreeTileLoadState', function() {
 
 define('Scene/QuadtreeTileProvider', function() {
     return Cesium['QuadtreeTileProvider'];
-});
-
-define('Scene/RectanglePrimitive', function() {
-    return Cesium['RectanglePrimitive'];
 });
 
 define('Scene/Scene', function() {
@@ -1776,10 +1780,6 @@ define('Scene/getModelAccessor', function() {
 
 define('Scene/modelMaterialsCommon', function() {
     return Cesium['modelMaterialsCommon'];
-});
-
-define('Scene/terrainAttributeLocations', function() {
-    return Cesium['terrainAttributeLocations'];
 });
 
 define('Shaders/AdjustTranslucentFS', function() {
