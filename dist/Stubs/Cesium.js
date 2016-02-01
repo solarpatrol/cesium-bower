@@ -710,8 +710,16 @@ define('Core/freezeObject', function() {
     return Cesium['freezeObject'];
 });
 
+define('Core/getAbsoluteUri', function() {
+    return Cesium['getAbsoluteUri'];
+});
+
 define('Core/getBaseUri', function() {
     return Cesium['getBaseUri'];
+});
+
+define('Core/getExtensionFromUri', function() {
+    return Cesium['getExtensionFromUri'];
 });
 
 define('Core/getFilenameFromUri', function() {
@@ -1390,6 +1398,10 @@ define('Scene/DepthPlane', function() {
     return Cesium['DepthPlane'];
 });
 
+define('Scene/DeviceOrientationCameraController', function() {
+    return Cesium['DeviceOrientationCameraController'];
+});
+
 define('Scene/DiscardMissingTileImagePolicy', function() {
     return Cesium['DiscardMissingTileImagePolicy'];
 });
@@ -1714,6 +1726,10 @@ define('Scene/TextureAtlas', function() {
     return Cesium['TextureAtlas'];
 });
 
+define('Scene/TileBoundingBox', function() {
+    return Cesium['TileBoundingBox'];
+});
+
 define('Scene/TileCoordinatesImageryProvider', function() {
     return Cesium['TileCoordinatesImageryProvider'];
 });
@@ -1772,6 +1788,10 @@ define('Scene/createOpenStreetMapImageryProvider', function() {
 
 define('Scene/createTangentSpaceDebugPrimitive', function() {
     return Cesium['createTangentSpaceDebugPrimitive'];
+});
+
+define('Scene/createTileMapServiceImageryProvider', function() {
+    return Cesium['createTileMapServiceImageryProvider'];
 });
 
 define('Scene/getModelAccessor', function() {
@@ -2342,6 +2362,10 @@ define('ThirdParty/Autolinker', function() {
     return Cesium['Autolinker'];
 });
 
+define('ThirdParty/NoSleep', function() {
+    return Cesium['NoSleep'];
+});
+
 define('ThirdParty/Tween', function() {
     return Cesium['Tween'];
 });
@@ -2520,6 +2544,14 @@ define('Widgets/Timeline/TimelineTrack', function() {
 
 define('Widgets/ToggleButtonViewModel', function() {
     return Cesium['ToggleButtonViewModel'];
+});
+
+define('Widgets/VRButton/VRButton', function() {
+    return Cesium['VRButton'];
+});
+
+define('Widgets/VRButton/VRButtonViewModel', function() {
+    return Cesium['VRButtonViewModel'];
 });
 
 define('Widgets/Viewer/Viewer', function() {
