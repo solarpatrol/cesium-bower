@@ -1,7 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "vec2 czm_decompressTextureCoordinates(float encoded)\n\
 {\n\
 float temp = encoded / 4096.0;\n\

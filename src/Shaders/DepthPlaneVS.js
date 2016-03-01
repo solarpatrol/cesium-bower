@@ -1,7 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "attribute vec4 position;\n\
 varying vec4 positionEC;\n\
 void main()\n\

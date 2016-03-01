@@ -1,7 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "czm_ellipsoid czm_ellipsoidNew(vec3 center, vec3 radii)\n\
 {\n\
 vec3 inverseRadii = vec3(1.0 / radii.x, 1.0 / radii.y, 1.0 / radii.z);\n\

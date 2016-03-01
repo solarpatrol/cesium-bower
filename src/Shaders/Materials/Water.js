@@ -1,7 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "uniform sampler2D specularMap;\n\
 uniform sampler2D normalMap;\n\
 uniform vec4 baseWaterColor;\n\

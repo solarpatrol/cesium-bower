@@ -1,7 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "mat3 czm_eastNorthUpToEyeCoordinates(vec3 positionMC, vec3 normalEC)\n\
 {\n\
 vec3 tangentMC = normalize(vec3(-positionMC.y, positionMC.x, 0.0));\n\

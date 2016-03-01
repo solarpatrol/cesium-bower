@@ -1,7 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "czm_ellipsoid czm_getWgs84EllipsoidEC()\n\
 {\n\
 vec3 radii = vec3(6378137.0, 6378137.0, 6356752.314245);\n\

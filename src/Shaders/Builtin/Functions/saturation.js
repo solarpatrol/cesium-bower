@@ -1,7 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "vec3 czm_saturation(vec3 rgb, float adjustment)\n\
 {\n\
 const vec3 W = vec3(0.2125, 0.7154, 0.0721);\n\

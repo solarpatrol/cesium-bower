@@ -1,7 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "vec2 cordic(float angle)\n\
 {\n\
 vec2 vector = vec2(6.0725293500888267e-1, 0.0);\n\

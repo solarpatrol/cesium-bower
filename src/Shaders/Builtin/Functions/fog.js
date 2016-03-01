@@ -1,7 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "vec3 czm_fog(float distanceToCamera, vec3 color, vec3 fogColor)\n\
 {\n\
 float scalar = distanceToCamera * czm_fogDensity;\n\

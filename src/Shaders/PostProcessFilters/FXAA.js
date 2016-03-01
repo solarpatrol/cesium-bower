@@ -15,7 +15,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "#ifndef FXAA_PRESET\n\
 #define FXAA_PRESET 3\n\
 #endif\n\
