@@ -1,7 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "uniform float u_glowLengthTS;\n\
 uniform float u_radiusTS;\n\
 varying vec2 v_textureCoordinates;\n\

@@ -1,7 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "uniform vec4 u_initialColor;\n\
 #if TEXTURE_UNITS > 0\n\
 uniform sampler2D u_dayTextures[TEXTURE_UNITS];\n\

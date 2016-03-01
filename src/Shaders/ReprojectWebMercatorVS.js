@@ -1,7 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "attribute vec4 position;\n\
 attribute float webMercatorT;\n\
 uniform vec2 u_textureDimensions;\n\

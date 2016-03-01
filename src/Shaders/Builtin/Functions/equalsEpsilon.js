@@ -1,7 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "bool czm_equalsEpsilon(vec4 left, vec4 right, float epsilon) {\n\
 return all(lessThanEqual(abs(left - right), vec4(epsilon)));\n\
 }\n\

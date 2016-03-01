@@ -1,7 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "#extension GL_OES_standard_derivatives : enable\n\
 uniform vec4 color;\n\
 varying float v_width;\n\

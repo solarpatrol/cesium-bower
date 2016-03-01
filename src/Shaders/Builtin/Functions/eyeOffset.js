@@ -1,7 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "vec4 czm_eyeOffset(vec4 positionEC, vec3 eyeOffset)\n\
 {\n\
 vec4 p = positionEC;\n\

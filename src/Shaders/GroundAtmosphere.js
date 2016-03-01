@@ -1,7 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "const float fInnerRadius = 6378137.0;\n\
 const float fOuterRadius = 6378137.0 * 1.025;\n\
 const float fOuterRadius2 = fOuterRadius * fOuterRadius;\n\

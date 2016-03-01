@@ -1,7 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "struct czm_ellipsoid\n\
 {\n\
 vec3 center;\n\

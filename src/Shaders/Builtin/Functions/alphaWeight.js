@@ -1,7 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "float czm_alphaWeight(float a)\n\
 {\n\
 float z;\n\

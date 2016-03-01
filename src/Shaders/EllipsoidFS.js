@@ -1,7 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "#ifdef WRITE_DEPTH\n\
 #ifdef GL_EXT_frag_depth\n\
 #extension GL_EXT_frag_depth : enable\n\

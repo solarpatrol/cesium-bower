@@ -1,7 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "void clipLineSegmentToNearPlane(\n\
 vec3 p0,\n\
 vec3 p1,\n\

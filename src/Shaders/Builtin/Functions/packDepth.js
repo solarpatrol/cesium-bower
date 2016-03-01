@@ -1,7 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "vec4 czm_packDepth(float depth)\n\
 {\n\
 vec4 enc = vec4(1.0, 255.0, 65025.0, 160581375.0) * depth;\n\

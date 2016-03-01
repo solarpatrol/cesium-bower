@@ -1,7 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "float czm_nearFarScalar(vec4 nearFarScalar, float cameraDistSq)\n\
 {\n\
 float valueAtMin = nearFarScalar.y;\n\

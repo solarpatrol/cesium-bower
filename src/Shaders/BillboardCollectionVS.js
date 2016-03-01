@@ -1,7 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 /*global define*/
 define(function() {
-    "use strict";
+    'use strict';
     return "#ifdef INSTANCED\n\
 attribute vec2 direction;\n\
 #endif\n\
