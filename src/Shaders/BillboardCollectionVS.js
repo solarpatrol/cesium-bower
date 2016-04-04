@@ -33,7 +33,7 @@ const float SHIFT_RIGHT5 = 1.0 / 32.0;\n\
 const float SHIFT_RIGHT3 = 1.0 / 8.0;\n\
 const float SHIFT_RIGHT2 = 1.0 / 4.0;\n\
 const float SHIFT_RIGHT1 = 1.0 / 2.0;\n\
-vec4 computePositionWindowCoordinates(vec4 positionEC, vec2 imageSize, float scale, vec2 direction, vec2 origin, vec2 translate, vec2 pixelOffset, vec3 alignedAxis, float rotation, bool sizeInMeters)\n\
+vec4 computePositionWindowCoordinates(vec4 positionEC, vec2 imageSize, float scale, vec2 direction, vec2 origin, vec2 translate, vec2 pixelOffset, vec3 alignedAxis, bool validAlignedAxis, float rotation, bool sizeInMeters)\n\
 {\n\
 vec2 halfSize = imageSize * scale * czm_resolutionScale;\n\
 halfSize *= ((direction * 2.0) - 1.0);\n\
@@ -51,10 +51,10 @@ else\n\
 positionWC.xy += (origin * abs(halfSize));\n\
 }\n\
 #if defined(ROTATION) || defined(ALIGNED_AXIS)\n\
-if (!all(equal(alignedAxis, vec3(0.0))) || rotation != 0.0)\n\
+if (validAlignedAxis || rotation != 0.0)\n\
 {\n\
 float angle = rotation;\n\
-if (!all(equal(alignedAxis, vec3(0.0))))\n\
+if (validAlignedAxis)\n\
 {\n\
 vec3 pos = positionEC.xyz + czm_encodedCameraPositionMCHigh + czm_encodedCameraPositionMCLow;\n\
 vec3 normal = normalize(cross(alignedAxis, pos));\n\
@@ -129,8 +129,11 @@ translucencyByDistance.w = ((temp - floor(temp)) * SHIFT_LEFT8) / 255.0;\n\
 #endif\n\
 #ifdef ALIGNED_AXIS\n\
 vec3 alignedAxis = czm_octDecode(floor(compressedAttribute1.y * SHIFT_RIGHT8));\n\
+temp = compressedAttribute2.z * SHIFT_RIGHT5;\n\
+bool validAlignedAxis = (temp - floor(temp)) * SHIFT_LEFT1 > 0.0;\n\
 #else\n\
 vec3 alignedAxis = vec3(0.0);\n\
+bool validAlignedAxis = false;\n\
 #endif\n\
 #ifdef RENDER_FOR_PICK\n\
 temp = compressedAttribute2.y;\n\
@@ -144,7 +147,7 @@ temp = floor(temp) * SHIFT_RIGHT8;\n\
 color.g = (temp - floor(temp)) * SHIFT_LEFT8;\n\
 color.r = floor(temp);\n\
 temp = compressedAttribute2.z * SHIFT_RIGHT8;\n\
-bool sizeInMeters = (temp - floor(temp)) * SHIFT_LEFT8 > 0.0;\n\
+bool sizeInMeters = floor((temp - floor(temp)) * SHIFT_LEFT7) > 0.0;\n\
 temp = floor(temp) * SHIFT_RIGHT8;\n\
 #ifdef RENDER_FOR_PICK\n\
 color.a = (temp - floor(temp)) * SHIFT_LEFT8;\n\
@@ -191,7 +194,7 @@ pixelOffset *= pixelOffsetScale;\n\
 positionEC.z *= 0.995;\n\
 origin.y = 1.0;\n\
 #endif\n\
-vec4 positionWC = computePositionWindowCoordinates(positionEC, imageSize, scale, direction, origin, translate, pixelOffset, alignedAxis, rotation, sizeInMeters);\n\
+vec4 positionWC = computePositionWindowCoordinates(positionEC, imageSize, scale, direction, origin, translate, pixelOffset, alignedAxis, validAlignedAxis, rotation, sizeInMeters);\n\
 gl_Position = czm_viewportOrthographic * vec4(positionWC.xy, -positionWC.z, 1.0);\n\
 v_textureCoordinates = textureCoordinates;\n\
 #ifdef RENDER_FOR_PICK\n\
