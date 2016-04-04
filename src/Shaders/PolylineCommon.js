@@ -52,11 +52,11 @@ vec2 prevWC = normalize(p0.xy - endPointWC.xy);\n\
 vec2 nextWC = normalize(p1.xy - endPointWC.xy);\n\
 float expandWidth = width * 0.5;\n\
 vec2 direction;\n\
-if (czm_equalsEpsilon(normalize(previous.xyz - position.xyz), vec3(0.0), czm_epsilon1) || czm_equalsEpsilon(prevWC, -nextWC, czm_epsilon1))\n\
+if (czm_equalsEpsilon(previous.xyz - position.xyz, vec3(0.0), czm_epsilon1) || czm_equalsEpsilon(prevWC, -nextWC, czm_epsilon1))\n\
 {\n\
 direction = vec2(-nextWC.y, nextWC.x);\n\
 }\n\
-else if (czm_equalsEpsilon(normalize(next.xyz - position.xyz), vec3(0.0), czm_epsilon1) || clipped)\n\
+else if (czm_equalsEpsilon(next.xyz - position.xyz, vec3(0.0), czm_epsilon1) || clipped)\n\
 {\n\
 direction = vec2(prevWC.y, -prevWC.x);\n\
 }\n\
