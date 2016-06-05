@@ -103,8 +103,8 @@ color = vec4(1.0, 0.0, 0.0, 1.0);\n\
 }\n\
 #endif\n\
 #if defined(SHOW_REFLECTIVE_OCEAN) || defined(ENABLE_DAYNIGHT_SHADING)\n\
-vec3 normalMC = normalize(czm_geodeticSurfaceNormal(v_positionMC, vec3(0.0), vec3(1.0)));\n\
-vec3 normalEC = normalize(czm_normal3D * normalMC);\n\
+vec3 normalMC = czm_geodeticSurfaceNormal(v_positionMC, vec3(0.0), vec3(1.0));\n\
+vec3 normalEC = czm_normal3D * normalMC;\n\
 #endif\n\
 #ifdef SHOW_REFLECTIVE_OCEAN\n\
 vec2 waterMaskTranslation = u_waterMaskTranslationAndScale.xy;\n\

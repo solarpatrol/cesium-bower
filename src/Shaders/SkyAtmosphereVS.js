@@ -34,22 +34,15 @@
 define(function() {
     'use strict';
     return "attribute vec4 position;\n\
-uniform float fCameraHeight;\n\
-uniform float fCameraHeight2;\n\
-uniform float fOuterRadius;\n\
-uniform float fOuterRadius2;\n\
-uniform float fInnerRadius;\n\
-uniform float fScale;\n\
-uniform float fScaleDepth;\n\
-uniform float fScaleOverScaleDepth;\n\
+uniform vec4 u_cameraAndRadiiAndDynamicAtmosphereColor;\n\
 const float Kr = 0.0025;\n\
-const float fKr4PI = Kr * 4.0 * czm_pi;\n\
+const float Kr4PI = Kr * 4.0 * czm_pi;\n\
 const float Km = 0.0015;\n\
-const float fKm4PI = Km * 4.0 * czm_pi;\n\
+const float Km4PI = Km * 4.0 * czm_pi;\n\
 const float ESun = 15.0;\n\
-const float fKmESun = Km * ESun;\n\
-const float fKrESun = Kr * ESun;\n\
-const vec3 v3InvWavelength = vec3(\n\
+const float KmESun = Km * ESun;\n\
+const float KrESun = Kr * ESun;\n\
+const vec3 InvWavelength = vec3(\n\
 5.60204474633241,\n\
 9.473284437923038,\n\
 19.643802610477206);\n\
@@ -59,54 +52,59 @@ const float fSamples = 2.0;\n\
 varying vec3 v_rayleighColor;\n\
 varying vec3 v_mieColor;\n\
 varying vec3 v_toCamera;\n\
-float scale(float fCos)\n\
+float scale(float cosAngle)\n\
 {\n\
-float x = 1.0 - fCos;\n\
-return fScaleDepth * exp(-0.00287 + x*(0.459 + x*(3.83 + x*(-6.80 + x*5.25))));\n\
+float x = 1.0 - cosAngle;\n\
+return rayleighScaleDepth  * exp(-0.00287 + x*(0.459 + x*(3.83 + x*(-6.80 + x*5.25))));\n\
 }\n\
 void main(void)\n\
 {\n\
-vec3 v3Pos = position.xyz;\n\
-vec3 v3Ray = v3Pos - czm_viewerPositionWC;\n\
-float fFar = length(v3Ray);\n\
-v3Ray /= fFar;\n\
+float cameraHeight = u_cameraAndRadiiAndDynamicAtmosphereColor.x;\n\
+float outerRadius = u_cameraAndRadiiAndDynamicAtmosphereColor.y;\n\
+float innerRadius = u_cameraAndRadiiAndDynamicAtmosphereColor.z;\n\
+vec3 positionV3 = position.xyz;\n\
+vec3 ray = positionV3 - czm_viewerPositionWC;\n\
+float far = length(ray);\n\
+ray /= far;\n\
+float atmosphereScale = 1.0 / (outerRadius - innerRadius);\n\
 #ifdef SKY_FROM_SPACE\n\
-float B = 2.0 * dot(czm_viewerPositionWC, v3Ray);\n\
-float C = fCameraHeight2 - fOuterRadius2;\n\
-float fDet = max(0.0, B*B - 4.0 * C);\n\
-float fNear = 0.5 * (-B - sqrt(fDet));\n\
-vec3 v3Start = czm_viewerPositionWC + v3Ray * fNear;\n\
-fFar -= fNear;\n\
-float fStartAngle = dot(v3Ray, v3Start) / fOuterRadius;\n\
-float fStartDepth = exp(-1.0 / fScaleDepth);\n\
-float fStartOffset = fStartDepth*scale(fStartAngle);\n\
+float B = 2.0 * dot(czm_viewerPositionWC, ray);\n\
+float C = cameraHeight * cameraHeight - outerRadius * outerRadius;\n\
+float det = max(0.0, B*B - 4.0 * C);\n\
+float near = 0.5 * (-B - sqrt(det));\n\
+vec3 start = czm_viewerPositionWC + ray * near;\n\
+far -= near;\n\
+float startAngle = dot(ray, start) / outerRadius;\n\
+float startDepth = exp(-1.0 / rayleighScaleDepth );\n\
+float startOffset = startDepth*scale(startAngle);\n\
 #else\n\
-vec3 v3Start = czm_viewerPositionWC;\n\
-float fHeight = length(v3Start);\n\
-float fDepth = exp(fScaleOverScaleDepth * (fInnerRadius - fCameraHeight));\n\
-float fStartAngle = dot(v3Ray, v3Start) / fHeight;\n\
-float fStartOffset = fDepth*scale(fStartAngle);\n\
+vec3 start = czm_viewerPositionWC;\n\
+float height = length(start);\n\
+float depth = exp((atmosphereScale / rayleighScaleDepth ) * (innerRadius - cameraHeight));\n\
+float startAngle = dot(ray, start) / height;\n\
+float startOffset = depth*scale(startAngle);\n\
 #endif\n\
-float fSampleLength = fFar / fSamples;\n\
-float fScaledLength = fSampleLength * fScale;\n\
-vec3 v3SampleRay = v3Ray * fSampleLength;\n\
-vec3 v3SamplePoint = v3Start + v3SampleRay * 0.5;\n\
-vec3 v3FrontColor = vec3(0.0, 0.0, 0.0);\n\
+float sampleLength = far / fSamples;\n\
+float scaledLength = sampleLength * atmosphereScale;\n\
+vec3 sampleRay = ray * sampleLength;\n\
+vec3 samplePoint = start + sampleRay * 0.5;\n\
+vec3 frontColor = vec3(0.0, 0.0, 0.0);\n\
+vec3 lightDir = (u_cameraAndRadiiAndDynamicAtmosphereColor.w > 0.0) ? czm_sunPositionWC - czm_viewerPositionWC : czm_viewerPositionWC;\n\
+lightDir = normalize(lightDir);\n\
 for(int i=0; i<nSamples; i++)\n\
 {\n\
-float fHeight = length(v3SamplePoint);\n\
-float fDepth = exp(fScaleOverScaleDepth * (fInnerRadius - fHeight));\n\
-vec3 lightPosition = normalize(czm_viewerPositionWC);\n\
-float fLightAngle = dot(lightPosition, v3SamplePoint) / fHeight;\n\
-float fCameraAngle = dot(v3Ray, v3SamplePoint) / fHeight;\n\
-float fScatter = (fStartOffset + fDepth*(scale(fLightAngle) - scale(fCameraAngle)));\n\
-vec3 v3Attenuate = exp(-fScatter * (v3InvWavelength * fKr4PI + fKm4PI));\n\
-v3FrontColor += v3Attenuate * (fDepth * fScaledLength);\n\
-v3SamplePoint += v3SampleRay;\n\
+float height = length(samplePoint);\n\
+float depth = exp((atmosphereScale / rayleighScaleDepth ) * (innerRadius - height));\n\
+float fLightAngle = dot(lightDir, samplePoint) / height;\n\
+float fCameraAngle = dot(ray, samplePoint) / height;\n\
+float fScatter = (startOffset + depth*(scale(fLightAngle) - scale(fCameraAngle)));\n\
+vec3 attenuate = exp(-fScatter * (InvWavelength * Kr4PI + Km4PI));\n\
+frontColor += attenuate * (depth * scaledLength);\n\
+samplePoint += sampleRay;\n\
 }\n\
-v_mieColor = v3FrontColor * fKmESun;\n\
-v_rayleighColor = v3FrontColor * (v3InvWavelength * fKrESun);\n\
-v_toCamera = czm_viewerPositionWC - v3Pos;\n\
+v_mieColor = frontColor * KmESun;\n\
+v_rayleighColor = frontColor * (InvWavelength * KrESun);\n\
+v_toCamera = czm_viewerPositionWC - positionV3;\n\
 gl_Position = czm_modelViewProjection * position;\n\
 }\n\
 ";

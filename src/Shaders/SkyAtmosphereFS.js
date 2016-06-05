@@ -33,21 +33,48 @@
 /*global define*/
 define(function() {
     'use strict';
-    return "const float g = -0.95;\n\
+    return "#ifdef COLOR_CORRECT\n\
+uniform vec3 u_hsbShift;\n\
+#endif\n\
+const float g = -0.95;\n\
 const float g2 = g * g;\n\
+const vec4 K_RGB2HSB = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);\n\
+const vec4 K_HSB2RGB = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);\n\
 varying vec3 v_rayleighColor;\n\
 varying vec3 v_mieColor;\n\
 varying vec3 v_toCamera;\n\
 varying vec3 v_positionEC;\n\
+#ifdef COLOR_CORRECT\n\
+vec3 rgb2hsb(vec3 rgbColor)\n\
+{\n\
+vec4 p = mix(vec4(rgbColor.bg, K_RGB2HSB.wz), vec4(rgbColor.gb, K_RGB2HSB.xy), step(rgbColor.b, rgbColor.g));\n\
+vec4 q = mix(vec4(p.xyw, rgbColor.r), vec4(rgbColor.r, p.yzx), step(p.x, rgbColor.r));\n\
+float d = q.x - min(q.w, q.y);\n\
+return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + czm_epsilon7)), d / (q.x + czm_epsilon7), q.x);\n\
+}\n\
+vec3 hsb2rgb(vec3 hsbColor)\n\
+{\n\
+vec3 p = abs(fract(hsbColor.xxx + K_HSB2RGB.xyz) * 6.0 - K_HSB2RGB.www);\n\
+return hsbColor.z * mix(K_HSB2RGB.xxx, clamp(p - K_HSB2RGB.xxx, 0.0, 1.0), hsbColor.y);\n\
+}\n\
+#endif\n\
 void main (void)\n\
 {\n\
-float fCos = dot(czm_sunDirectionWC, normalize(v_toCamera)) / length(v_toCamera);\n\
-float fRayleighPhase = 0.75 * (1.0 + fCos * fCos);\n\
-float fMiePhase = 1.5 * ((1.0 - g2) / (2.0 + g2)) * (1.0 + fCos * fCos) / pow(1.0 + g2 - 2.0 * g * fCos, 1.5);\n\
-const float fExposure = 2.0;\n\
-vec3 rgb = fRayleighPhase * v_rayleighColor + fMiePhase * v_mieColor;\n\
-rgb = vec3(1.0) - exp(-fExposure * rgb);\n\
+float cosAngle = dot(czm_sunDirectionWC, normalize(v_toCamera)) / length(v_toCamera);\n\
+float rayleighPhase = 0.75 * (1.0 + cosAngle * cosAngle);\n\
+float miePhase = 1.5 * ((1.0 - g2) / (2.0 + g2)) * (1.0 + cosAngle * cosAngle) / pow(1.0 + g2 - 2.0 * g * cosAngle, 1.5);\n\
+const float exposure = 2.0;\n\
+vec3 rgb = rayleighPhase * v_rayleighColor + miePhase * v_mieColor;\n\
+rgb = vec3(1.0) - exp(-exposure * rgb);\n\
 float l = czm_luminance(rgb);\n\
+#ifdef COLOR_CORRECT\n\
+vec3 hsb = rgb2hsb(rgb);\n\
+hsb.x += u_hsbShift.x;\n\
+hsb.y = clamp(hsb.y + u_hsbShift.y, 0.0, 1.0);\n\
+hsb.z = hsb.z > czm_epsilon7 ? hsb.z + u_hsbShift.z : 0.0;\n\
+rgb = hsb2rgb(hsb);\n\
+l = min(l, czm_luminance(rgb));\n\
+#endif\n\
 gl_FragColor = vec4(rgb, min(smoothstep(0.0, 0.1, l), 1.0) * smoothstep(0.0, 1.0, czm_morphTime));\n\
 }\n\
 ";
