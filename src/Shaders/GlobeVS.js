@@ -10,6 +10,7 @@ attribute vec3 textureCoordAndEncodedNormals;\n\
 #endif\n\
 uniform vec3 u_center3D;\n\
 uniform mat4 u_modifiedModelView;\n\
+uniform mat4 u_modifiedModelViewProjection;\n\
 uniform vec4 u_tileRectangle;\n\
 uniform vec2 u_southAndNorthLatitude;\n\
 uniform vec2 u_southMercatorYAndOneOverHeight;\n\
@@ -27,7 +28,7 @@ vec4 getPosition(vec3 position, float height, vec2 textureCoordinates);\n\
 float get2DYPositionFraction(vec2 textureCoordinates);\n\
 vec4 getPosition3DMode(vec3 position, float height, vec2 textureCoordinates)\n\
 {\n\
-return czm_projection * (u_modifiedModelView * vec4(position, 1.0));\n\
+return u_modifiedModelViewProjection * vec4(position, 1.0);\n\
 }\n\
 float get2DMercatorYPositionFraction(vec2 textureCoordinates)\n\
 {\n\
@@ -53,7 +54,7 @@ vec4 getPositionPlanarEarth(vec3 position, float height, vec2 textureCoordinates
 {\n\
 float yPositionFraction = get2DYPositionFraction(textureCoordinates);\n\
 vec4 rtcPosition2D = vec4(height, mix(u_tileRectangle.st, u_tileRectangle.pq, vec2(textureCoordinates.x, yPositionFraction)), 1.0);\n\
-return czm_projection * (u_modifiedModelView * rtcPosition2D);\n\
+return u_modifiedModelViewProjection * rtcPosition2D;\n\
 }\n\
 vec4 getPosition2DMode(vec3 position, float height, vec2 textureCoordinates)\n\
 {\n\
@@ -95,13 +96,13 @@ float encodedNormal = textureCoordAndEncodedNormals.z;\n\
 vec3 position3DWC = position + u_center3D;\n\
 gl_Position = getPosition(position, height, textureCoordinates);\n\
 v_textureCoordinates = textureCoordinates;\n\
-#if defined(ENABLE_VERTEX_LIGHTING)\n\
-v_positionEC = (czm_modelView3D * vec4(position3DWC, 1.0)).xyz;\n\
+#if defined(ENABLE_VERTEX_LIGHTING) || defined(GENERATE_POSITION_AND_NORMAL)\n\
+v_positionEC = (u_modifiedModelView * vec4(position, 1.0)).xyz;\n\
 v_positionMC = position3DWC;\n\
 v_normalMC = czm_octDecode(encodedNormal);\n\
 v_normalEC = czm_normal3D * v_normalMC;\n\
-#elif defined(SHOW_REFLECTIVE_OCEAN) || defined(ENABLE_DAYNIGHT_SHADING)\n\
-v_positionEC = (czm_modelView3D * vec4(position3DWC, 1.0)).xyz;\n\
+#elif defined(SHOW_REFLECTIVE_OCEAN) || defined(ENABLE_DAYNIGHT_SHADING) || defined(GENERATE_POSITION)\n\
+v_positionEC = (u_modifiedModelView * vec4(position, 1.0)).xyz;\n\
 v_positionMC = position3DWC;\n\
 #endif\n\
 #ifdef FOG\n\
