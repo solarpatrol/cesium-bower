@@ -190,10 +190,6 @@ positionEC.xyz = vec3(0.0);\n\
 float pixelOffsetScale = czm_nearFarScalar(pixelOffsetScaleByDistance, lengthSq);\n\
 pixelOffset *= pixelOffsetScale;\n\
 #endif\n\
-#ifdef CLAMPED_TO_GROUND\n\
-positionEC.z *= 0.995;\n\
-origin.y = 1.0;\n\
-#endif\n\
 vec4 positionWC = computePositionWindowCoordinates(positionEC, imageSize, scale, direction, origin, translate, pixelOffset, alignedAxis, validAlignedAxis, rotation, sizeInMeters);\n\
 gl_Position = czm_viewportOrthographic * vec4(positionWC.xy, -positionWC.z, 1.0);\n\
 v_textureCoordinates = textureCoordinates;\n\
