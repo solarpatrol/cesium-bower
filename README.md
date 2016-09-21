@@ -46,7 +46,7 @@ remote for this one should be added:
         cd ./cesium
         git remote add cesium git@github.com:AnalyticalGraphicsInc/cesium
         
-7. Get latest changes from original repository and and push them to the fork:
+7. Get latest changes from original repository and push them to the fork:
 
         git checkout master
         git fetch cesium
@@ -54,7 +54,7 @@ remote for this one should be added:
         git push origin master
         git push origin --tags
 
-8. Checkout to release commit marked by a tag. Say, it's `1.25` for version 1.25:
+8. Checkout release commit marked by a tag. Say, it's `1.25` for version 1.25:
         
         git checkout 1.25
         
@@ -76,9 +76,9 @@ since previous Cesium release):
         
         cd /path/to/local/cesium-bower
         rm -Rf ./src
-        cp -R cesium/Source ./src
+        cp -R ./cesium/Source ./src
         rm -Rf ./dist
-        cp -R cesium/Build/Cesium ./dist
+        cp -R ./cesium/Build/Cesium ./dist
         
 13. Add changes to repository:
         
