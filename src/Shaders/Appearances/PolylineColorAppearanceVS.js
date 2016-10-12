@@ -10,6 +10,7 @@ attribute vec3 nextPosition3DHigh;\n\
 attribute vec3 nextPosition3DLow;\n\
 attribute vec2 expandAndWidth;\n\
 attribute vec4 color;\n\
+attribute float batchId;\n\
 varying vec4 v_color;\n\
 void main()\n\
 {\n\

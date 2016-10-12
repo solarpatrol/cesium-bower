@@ -10,6 +10,7 @@ attribute vec3 nextPosition3DHigh;\n\
 attribute vec3 nextPosition3DLow;\n\
 attribute vec2 expandAndWidth;\n\
 attribute vec2 st;\n\
+attribute float batchId;\n\
 varying float v_width;\n\
 varying vec2 v_st;\n\
 void main()\n\
