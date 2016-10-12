@@ -5,6 +5,7 @@ define(function() {
     return "attribute vec3 position3DHigh;\n\
 attribute vec3 position3DLow;\n\
 attribute vec4 color;\n\
+attribute float batchId;\n\
 varying float v_WindowZ;\n\
 varying vec4 v_color;\n\
 vec4 depthClampFarPlane(vec4 vertexInClipCoordinates)\n\

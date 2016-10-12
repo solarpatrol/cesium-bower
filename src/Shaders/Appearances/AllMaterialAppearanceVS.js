@@ -8,6 +8,7 @@ attribute vec3 normal;\n\
 attribute vec3 tangent;\n\
 attribute vec3 binormal;\n\
 attribute vec2 st;\n\
+attribute float batchId;\n\
 varying vec3 v_positionEC;\n\
 varying vec3 v_normalEC;\n\
 varying vec3 v_tangentEC;\n\

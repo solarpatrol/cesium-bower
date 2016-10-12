@@ -5,6 +5,7 @@ define(function() {
     return "attribute vec3 position3DHigh;\n\
 attribute vec3 position3DLow;\n\
 attribute vec3 color;\n\
+attribute float batchId;\n\
 uniform float pointSize;\n\
 varying vec3 v_positionEC;\n\
 varying vec3 v_color;\n\

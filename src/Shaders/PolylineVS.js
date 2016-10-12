@@ -14,18 +14,24 @@ attribute vec3 nextPosition3DHigh;\n\
 attribute vec3 nextPosition3DLow;\n\
 attribute vec3 nextPosition2DHigh;\n\
 attribute vec3 nextPosition2DLow;\n\
-attribute vec4 texCoordExpandWidthAndShow;\n\
-attribute vec4 pickColor;\n\
+attribute vec4 texCoordExpandAndBatchIndex;\n\
 varying vec2  v_st;\n\
 varying float v_width;\n\
 varying vec4  czm_pickColor;\n\
 void main()\n\
 {\n\
-float texCoord = texCoordExpandWidthAndShow.x;\n\
-float expandDir = texCoordExpandWidthAndShow.y;\n\
-float width = abs(texCoordExpandWidthAndShow.z) + 0.5;\n\
-bool usePrev = texCoordExpandWidthAndShow.z < 0.0;\n\
-float show = texCoordExpandWidthAndShow.w;\n\
+float texCoord = texCoordExpandAndBatchIndex.x;\n\
+float expandDir = texCoordExpandAndBatchIndex.y;\n\
+bool usePrev = texCoordExpandAndBatchIndex.z < 0.0;\n\
+float batchTableIndex = texCoordExpandAndBatchIndex.w;\n\
+vec2 widthAndShow = batchTable_getWidthAndShow(batchTableIndex);\n\
+float width = widthAndShow.x + 0.5;\n\
+float show = widthAndShow.y;\n\
+if (width < 1.0)\n\
+{\n\
+show = 0.0;\n\
+}\n\
+vec4 pickColor = batchTable_getPickColor(batchTableIndex);\n\
 vec4 p, prev, next;\n\
 if (czm_morphTime == 1.0)\n\
 {\n\
@@ -54,6 +60,29 @@ czm_translateRelativeToEye(nextPosition2DHigh.zxy, nextPosition2DLow.zxy),\n\
 czm_translateRelativeToEye(nextPosition3DHigh.xyz, nextPosition3DLow.xyz),\n\
 czm_morphTime);\n\
 }\n\
+#ifdef DISTANCE_DISPLAY_CONDITION\n\
+vec3 centerHigh = batchTable_getCenterHigh(batchTableIndex);\n\
+vec4 centerLowAndRadius = batchTable_getCenterLowAndRadius(batchTableIndex);\n\
+vec3 centerLow = centerLowAndRadius.xyz;\n\
+float radius = centerLowAndRadius.w;\n\
+vec2 distanceDisplayCondition = batchTable_getDistanceDisplayCondition(batchTableIndex);\n\
+float lengthSq;\n\
+if (czm_sceneMode == czm_sceneMode2D)\n\
+{\n\
+lengthSq = czm_eyeHeight2D.y;\n\
+}\n\
+else\n\
+{\n\
+vec4 center = czm_translateRelativeToEye(centerHigh.xyz, centerLow.xyz);\n\
+lengthSq = max(0.0, dot(center.xyz, center.xyz) - radius * radius);\n\
+}\n\
+float nearSq = distanceDisplayCondition.x * distanceDisplayCondition.x;\n\
+float farSq = distanceDisplayCondition.y * distanceDisplayCondition.y;\n\
+if (lengthSq < nearSq || lengthSq > farSq)\n\
+{\n\
+show = 0.0;\n\
+}\n\
+#endif\n\
 vec4 positionWC = getPolylineWindowCoordinates(p, prev, next, expandDir, width, usePrev);\n\
 gl_Position = czm_viewportOrthographic * positionWC * show;\n\
 v_st = vec2(texCoord, clamp(expandDir, 0.0, 1.0));\n\

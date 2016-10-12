@@ -8,6 +8,7 @@ attribute vec4 positionLowAndOutline;\n\
 attribute vec4 compressedAttribute0;\n\
 attribute vec4 compressedAttribute1;\n\
 attribute vec4 scaleByDistance;\n\
+attribute vec2 distanceDisplayCondition;\n\
 varying vec4 v_color;\n\
 varying vec4 v_outlineColor;\n\
 varying float v_innerPercent;\n\
@@ -72,7 +73,7 @@ color /= 255.0;\n\
 vec4 p = czm_translateRelativeToEye(positionHigh, positionLow);\n\
 vec4 positionEC = czm_modelViewRelativeToEye * p;\n\
 positionEC.xyz *= show;\n\
-#if defined(EYE_DISTANCE_SCALING) || defined(EYE_DISTANCE_TRANSLUCENCY)\n\
+#if defined(EYE_DISTANCE_SCALING) || defined(EYE_DISTANCE_TRANSLUCENCY) || defined(DISTANCE_DISPLAY_CONDITION)\n\
 float lengthSq;\n\
 if (czm_sceneMode == czm_sceneMode2D)\n\
 {\n\
@@ -97,6 +98,13 @@ float translucency = 1.0;\n\
 translucency = czm_nearFarScalar(translucencyByDistance, lengthSq);\n\
 if (translucency < 0.004)\n\
 {\n\
+positionEC.xyz = vec3(0.0);\n\
+}\n\
+#endif\n\
+#ifdef DISTANCE_DISPLAY_CONDITION\n\
+float nearSq = distanceDisplayCondition.x * distanceDisplayCondition.x;\n\
+float farSq = distanceDisplayCondition.y * distanceDisplayCondition.y;\n\
+if (lengthSq < nearSq || lengthSq > farSq) {\n\
 positionEC.xyz = vec3(0.0);\n\
 }\n\
 #endif\n\

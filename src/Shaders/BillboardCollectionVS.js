@@ -13,6 +13,7 @@ attribute vec4 compressedAttribute2;\n\
 attribute vec4 eyeOffset;\n\
 attribute vec4 scaleByDistance;\n\
 attribute vec4 pixelOffsetScaleByDistance;\n\
+attribute vec2 distanceDisplayCondition;\n\
 varying vec2 v_textureCoordinates;\n\
 #ifdef RENDER_FOR_PICK\n\
 varying vec4 v_pickColor;\n\
@@ -37,19 +38,7 @@ vec4 computePositionWindowCoordinates(vec4 positionEC, vec2 imageSize, float sca
 {\n\
 vec2 halfSize = imageSize * scale * czm_resolutionScale;\n\
 halfSize *= ((direction * 2.0) - 1.0);\n\
-if (sizeInMeters)\n\
-{\n\
-positionEC.xy += halfSize;\n\
-}\n\
-vec4 positionWC = czm_eyeToWindowCoordinates(positionEC);\n\
-if (sizeInMeters)\n\
-{\n\
-positionWC.xy += (origin * abs(halfSize)) / czm_metersPerPixel(positionEC);\n\
-}\n\
-else\n\
-{\n\
-positionWC.xy += (origin * abs(halfSize));\n\
-}\n\
+vec2 originTranslate = origin * abs(halfSize);\n\
 #if defined(ROTATION) || defined(ALIGNED_AXIS)\n\
 if (validAlignedAxis || rotation != 0.0)\n\
 {\n\
@@ -68,6 +57,16 @@ mat2 rotationMatrix = mat2(cosTheta, sinTheta, -sinTheta, cosTheta);\n\
 halfSize = rotationMatrix * halfSize;\n\
 }\n\
 #endif\n\
+if (sizeInMeters)\n\
+{\n\
+positionEC.xy += halfSize;\n\
+}\n\
+vec4 positionWC = czm_eyeToWindowCoordinates(positionEC);\n\
+if (sizeInMeters)\n\
+{\n\
+originTranslate += originTranslate / czm_metersPerPixel(positionEC);\n\
+}\n\
+positionWC.xy += originTranslate;\n\
 if (!sizeInMeters)\n\
 {\n\
 positionWC.xy += halfSize;\n\
@@ -160,7 +159,7 @@ vec4 p = czm_translateRelativeToEye(positionHigh, positionLow);\n\
 vec4 positionEC = czm_modelViewRelativeToEye * p;\n\
 positionEC = czm_eyeOffset(positionEC, eyeOffset.xyz);\n\
 positionEC.xyz *= show;\n\
-#if defined(EYE_DISTANCE_SCALING) || defined(EYE_DISTANCE_TRANSLUCENCY) || defined(EYE_DISTANCE_PIXEL_OFFSET)\n\
+#if defined(EYE_DISTANCE_SCALING) || defined(EYE_DISTANCE_TRANSLUCENCY) || defined(EYE_DISTANCE_PIXEL_OFFSET) || defined(DISTANCE_DISPLAY_CONDITION)\n\
 float lengthSq;\n\
 if (czm_sceneMode == czm_sceneMode2D)\n\
 {\n\
@@ -189,6 +188,14 @@ positionEC.xyz = vec3(0.0);\n\
 #ifdef EYE_DISTANCE_PIXEL_OFFSET\n\
 float pixelOffsetScale = czm_nearFarScalar(pixelOffsetScaleByDistance, lengthSq);\n\
 pixelOffset *= pixelOffsetScale;\n\
+#endif\n\
+#ifdef DISTANCE_DISPLAY_CONDITION\n\
+float nearSq = distanceDisplayCondition.x * distanceDisplayCondition.x;\n\
+float farSq = distanceDisplayCondition.y * distanceDisplayCondition.y;\n\
+if (lengthSq < nearSq || lengthSq > farSq)\n\
+{\n\
+positionEC.xyz = vec3(0.0);\n\
+}\n\
 #endif\n\
 vec4 positionWC = computePositionWindowCoordinates(positionEC, imageSize, scale, direction, origin, translate, pixelOffset, alignedAxis, validAlignedAxis, rotation, sizeInMeters);\n\
 gl_Position = czm_viewportOrthographic * vec4(positionWC.xy, -positionWC.z, 1.0);\n\
