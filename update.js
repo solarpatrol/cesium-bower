@@ -14,7 +14,6 @@ if (!version) {
 }
 
 // Updating package.json
-console.log('Updating package.json...');
 var packageJsonFilePath = path.resolve(__dirname, 'package.json'),
     packageJson = jsonfile.readFileSync(packageJsonFilePath, {
         throws: false
@@ -30,15 +29,15 @@ if (!force && packageJson.version === version && packageJson.devDependencies.ces
     process.exit(0);
 }
 
+console.log('Updating package.json...');
 packageJson.version = version;
 packageJson.devDependencies.cesium = version;
-
 jsonfile.writeFileSync(packageJsonFilePath, packageJson, { spaces: 2 });
 
 // Updating Cesium library
 console.log('Updating Cesium library to ' + version + '...');
 if (shell.exec('npm update').code !== 0) {
-    process.exit(2);
+    process.exit(3);
 }
 
 // Copying source and build files
@@ -58,3 +57,18 @@ fs.copySync(cesiumSrcDirPath, srcDirPath);
 console.log('Copying build files...');
 fs.emptyDirSync(distDirPath);
 fs.copySync(cesiumDistDirPath, distDirPath);
+
+// Commiting changes
+shell.exec('git reset --mixed');
+
+console.log('Commiting source files...');
+shell.exec('git add src');
+shell.exec('git commit --dry-run -m "src directory is updated to ' + version + '."');
+
+console.log('Commiting build files...');
+shell.exec('git add dist');
+shell.exec('git commit --dry-run -m "dist directory is updated to ' + version + '."');
+
+console.log('Commiting package.json...');
+shell.exec('git add package.json');
+shell.exec('git commit --dry-run --allow-empty -m "Version bump."');

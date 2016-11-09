@@ -3,6 +3,7 @@
   "version": "1.27.0",
   "description": "Bower package of Cesium JavaScript library",
   "scripts": {
+    "update": "node update.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
