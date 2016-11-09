@@ -6,14 +6,17 @@ define(function() {
 attribute vec3 position3DLow;\n\
 attribute vec3 color;\n\
 attribute float batchId;\n\
+\n\
 uniform float pointSize;\n\
+\n\
 varying vec3 v_positionEC;\n\
 varying vec3 v_color;\n\
-void main()\n\
+\n\
+void main() \n\
 {\n\
-v_color = color;\n\
-gl_Position = czm_modelViewProjectionRelativeToEye * czm_computePosition();\n\
-gl_PointSize = pointSize;\n\
+    v_color = color;\n\
+    gl_Position = czm_modelViewProjectionRelativeToEye * czm_computePosition();\n\
+    gl_PointSize = pointSize;\n\
 }\n\
 ";
 });
