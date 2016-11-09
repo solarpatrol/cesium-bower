@@ -63,12 +63,12 @@ shell.exec('git reset --mixed');
 
 console.log('Commiting source files...');
 shell.exec('git add src');
-shell.exec('git commit --dry-run -m "src directory is updated to ' + version + '."');
+shell.exec('git commit -m "src directory is updated to ' + version + '."');
 
 console.log('Commiting build files...');
 shell.exec('git add dist');
-shell.exec('git commit --dry-run -m "dist directory is updated to ' + version + '."');
+shell.exec('git commit -m "dist directory is updated to ' + version + '."');
 
 console.log('Commiting package.json...');
 shell.exec('git add package.json');
-shell.exec('git commit --dry-run --allow-empty -m "Version bump."');
+shell.exec('git commit --allow-empty -m "Version bump."');
