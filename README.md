@@ -3,9 +3,8 @@
 This is a [Bower](http://bower.io/) package for amazing [Cesium](http://cesiumjs.org) JavaScript library
 for creating 3D globes and 2D maps in a web browser without a plugin.
 
-The package contains source files from original `Source` directory under `src` directory and a version built
-with original `npm run minifyRelease` [Gulp.js](http://gulpjs.com/) task under `dist` directory. Please note
-that latest [Node.js](http://nodejs.org) is required to run the task properly.
+The package contains source files from original `Source` directory under `src` directory and built minified files
+from `Build/Cesium` directory under `dist` directory.
 
 ## Installation
 
