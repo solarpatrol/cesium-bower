@@ -13,9 +13,56 @@ In order to install Cesium with Bower run:
 
     bower install cesium.js
     
-## How to add new Cesium release
+## How to prepare new Cesium release    
+
+1. Install recent [Node.js](https://nodejs.org/) and [Node Package Manager](https://npmjs.com/). Using
+[NVM](https://github.com/creationix/nvm) installation script is a preferable way to do this. [Git](https://git-scm.com/)
+is also required to clone repositories.
+
+2. Clone this repository:
+
+        git clone git@github.com:solarpatrol/cesium-bower /path/to/cesium-bower
+        
+3. Switch to `dev` branch:
+                
+        git checkout dev
+        
+4. Install development dependencies:
+
+        cd /path/to/cesium-bower
+        npm install
+        
+5. Run update script passing Cesium version to update to (say, to `1.27`):
+
+        npm run update 1.27.0
+        
+    This one will do the following steps:
     
-Follow these steps to update this Bower package to a new version of Cesium:
+    - update version fields in `package.json` file of this repository;
+    - install corresponding version of official [Cesium](https://www.npmjs.com/package/cesium) package in `node_modules`;
+    - copy source and build files from Cesium package to `src` and `dist` directories;
+    - commit all changes to current (`dev`) branch.
+    
+    If you get a message like
+    
+    > Bower package is already @1.27.0
+    
+    but want to continue update anyway then run:
+     
+        npm run update 1.27.0 -- --force
+    
+6. If you are a maintainer of this repository then merge all changes into `master` branch:
+
+        git checkout master
+        git merge --no-ff dev -m "Version 1.27.0."
+        git tag -a 1.27.0 -m "Version 1.27.0."
+        
+    If you are a contributor then [create a pull request](https://github.com/solarpatrol/cesium-bower/pull/new/dev) to
+    `dev` branch.
+    
+## How to build new Cesium release manually (deprecated)
+    
+Follow these steps to update this Bower package with custom Cesium build manually:
     
 1. Install recent [Node.js](https://nodejs.org/) and [Node Package Manager](https://npmjs.com/). Using
 [NVM](https://github.com/creationix/nvm) installation script is a preferable way to do this. [Git](https://git-scm.com/)
@@ -27,7 +74,7 @@ is also required to clone repositories.
 
 3. Clone this repository:
 
-        git clone git@github.com:solarpatrol/cesium-bower /path/to/local/cesium-bower
+        git clone git@github.com:solarpatrol/cesium-bower /path/to/cesium-bower
         
 4. Switch to `dev` branch:
         
@@ -35,63 +82,54 @@ is also required to clone repositories.
 
 5. Initialize [Cesium](https://github.com/solarpatrol/cesium) Git submodule:
 
-        cd /path/to/local/cesium-bower
+        cd /path/to/cesium-bower
         git submodule init
         git submodule update
 
-6. Cesium Git submodule is a fork of [original Cesium repository](https://github.com/AnalyticalGraphicsInc/cesium)
-provided by Analytical Graphics Inc. In order to be able to update to the latest changes made in original repository a
-remote for this one should be added:
-
+6. Checkout release commit marked by a tag. Say, it's `1.27` for version 1.27:
+        
         cd ./cesium
-        git remote add cesium git@github.com:AnalyticalGraphicsInc/cesium
+        git checkout 1.27
         
-7. Get latest changes from original repository and push them to the fork:
-
-        git checkout master
-        git fetch cesium
-        git merge cesium/master
-        git push origin master
-        git push origin --tags
-
-8. Checkout release commit marked by a tag. Say, it's `1.25` for version 1.25:
-        
-        git checkout 1.25
-        
-9. Reinstall node modules used to build Cesium (this step can be skipped if nothing has changed in `package.json`
+7. Reinstall node modules used to build Cesium (this step can be skipped if nothing has changed in `package.json`
 since previous Cesium release):
         
         rm -Rf node_modules
         npm install
         
-10. Remove output files from previous build:
+8. Remove output files from previous build:
         
         npm run clean
         
-11. Build new Cesium release:
+9. Build new Cesium release:
         
         npm run minifyRelease
         
-12. Update `src` and `dist` directories of Bower package:
+10. Update `src` and `dist` directories of Bower package:
         
-        cd /path/to/local/cesium-bower
+        cd /path/to/cesium-bower
         rm -Rf ./src
         cp -R ./cesium/Source ./src
         rm -Rf ./dist
         cp -R ./cesium/Build/Cesium ./dist
         
-13. Add changes to repository:
+11. Add changes to repository:
         
         git add cesium
-        git commit -m "Cesium is updated to 1.25."
+        git commit -m "Cesium is updated to 1.27."
         git add -A
-        git commit -m "src and dist directories are updated to version 1.25."
+        git commit -m "src and dist directories are updated to version 1.27."
         git checkout master
-        git merge --no-ff dev -m "Version 1.25.0."
-        git tag -a 1.25.0 -m "Version 1.25.0."
+        git merge --no-ff dev -m "Version 1.27.0."
+        git tag -a 1.27.0 -m "Version 1.27.0."
         git push origin dev
         git push origin master
         git push origin --tags
+                
+12. Update version fields in `package.json` file and commit it:
+ 
+        git add package.json
+        git commit -m "Version bump."
 
 ## Contribution
 
