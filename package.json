@@ -1,0 +1,33 @@
+{
+  "name": "cesium-bower",
+  "version": "1.27.0",
+  "description": "Bower package of Cesium JavaScript library",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solarpatrol/cesium-bower.git"
+  },
+  "main": "update.js",
+  "keywords": [
+    "cesium",
+    "3D",
+    "webgl",
+    "geospatial",
+    "map",
+    "globe"
+  ],
+  "author": "Dmitriy Pushkov <ezze@ezze.org>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/solarpatrol/cesium-bower/issues"
+  },
+  "homepage": "https://github.com/solarpatrol/cesium-bower#readme",
+  "devDependencies": {
+    "cesium": "1.27.0",
+    "gulp-cli": "^1.2.2",
+    "jsonfile": "^2.4.0",
+    "minimist": "^1.2.0"
+  }
+}
