@@ -51,7 +51,7 @@ is also required to clone repositories.
      
         npm run update 1.27.0 -- --force
     
-6. If you are a maintainer of this repository then merge all changes into `master` branch:
+6. If you are a maintainer of this repository then merge all changes to `master` branch:
 
         git checkout master
         git merge --no-ff dev -m "Version 1.27.0."
