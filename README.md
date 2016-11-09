@@ -118,17 +118,17 @@ since previous Cesium release):
         git commit -m "Cesium is updated to 1.27."
         git add -A
         git commit -m "src and dist directories are updated to version 1.27."
+        
+12. Update version fields in `package.json` file and commit it:
+         
+        git add package.json
+        git commit -m "Version bump."
+             
+13. Merge everything to `master` branch.
+
         git checkout master
         git merge --no-ff dev -m "Version 1.27.0."
         git tag -a 1.27.0 -m "Version 1.27.0."
-        git push origin dev
-        git push origin master
-        git push origin --tags
-                
-12. Update version fields in `package.json` file and commit it:
- 
-        git add package.json
-        git commit -m "Version bump."
 
 ## Contribution
 
