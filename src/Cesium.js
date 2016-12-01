@@ -3,7 +3,7 @@ define(['./Core/appendForwardSlash', './Core/ArcGisImageServerTerrainProvider', 
   'use strict';
   /*jshint sub:true*/
   var Cesium = {
-    VERSION : "1.27",
+    VERSION : "1.28",
     _shaders : {}
   };
   Cesium['appendForwardSlash'] = Core_appendForwardSlash;
