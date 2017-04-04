@@ -103,7 +103,7 @@ vec4 sampleAndBlend(\n\
     float alpha = value.a;\n\
 \n\
 #ifdef APPLY_SPLIT\n\
-    float splitPosition = czm_imagerySplitPosition * czm_viewport.z;\n\
+    float splitPosition = czm_imagerySplitPosition;\n\
     // Split to the left\n\
     if (split < 0.0 && gl_FragCoord.x > splitPosition) {\n\
        alpha = 0.0;\n\

@@ -27,6 +27,7 @@ void main()\n\
 \n\
     vec4 position = czm_computePosition();\n\
     float delta = min(u_globeMinimumAltitude, czm_geometricToleranceOverMeter * length(position.xyz));\n\
+    delta *= czm_sceneMode == czm_sceneMode3D ? 1.0 : 0.0;\n\
 \n\
     //extrudeDirection is zero for the top layer\n\
     position = position + vec4(extrudeDirection * delta, 0.0);\n\
