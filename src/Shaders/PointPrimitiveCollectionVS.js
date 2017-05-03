@@ -6,10 +6,10 @@ define(function() {
 \n\
 attribute vec4 positionHighAndSize;\n\
 attribute vec4 positionLowAndOutline;\n\
-attribute vec4 compressedAttribute0;        // color, outlineColor, pick color\n\
-attribute vec4 compressedAttribute1;        // show, translucency by distance, some free space\n\
-attribute vec4 scaleByDistance;             // near, nearScale, far, farScale\n\
-attribute vec2 distanceDisplayCondition;    // near, far\n\
+attribute vec4 compressedAttribute0;                       // color, outlineColor, pick color\n\
+attribute vec4 compressedAttribute1;                       // show, translucency by distance, some free space\n\
+attribute vec4 scaleByDistance;                            // near, nearScale, far, farScale\n\
+attribute vec3 distanceDisplayConditionAndDisableDepth;    // near, far, disableDepthTestDistance\n\
 \n\
 varying vec4 v_color;\n\
 varying vec4 v_outlineColor;\n\
@@ -106,7 +106,7 @@ void main()\n\
 \n\
     ///////////////////////////////////////////////////////////////////////////\n\
 \n\
-#if defined(EYE_DISTANCE_SCALING) || defined(EYE_DISTANCE_TRANSLUCENCY) || defined(DISTANCE_DISPLAY_CONDITION)\n\
+#if defined(EYE_DISTANCE_SCALING) || defined(EYE_DISTANCE_TRANSLUCENCY) || defined(DISTANCE_DISPLAY_CONDITION) || defined(DISABLE_DEPTH_DISTANCE)\n\
     float lengthSq;\n\
     if (czm_sceneMode == czm_sceneMode2D)\n\
     {\n\
@@ -144,8 +144,8 @@ void main()\n\
 #endif\n\
 \n\
 #ifdef DISTANCE_DISPLAY_CONDITION\n\
-    float nearSq = distanceDisplayCondition.x * distanceDisplayCondition.x;\n\
-    float farSq = distanceDisplayCondition.y * distanceDisplayCondition.y;\n\
+    float nearSq = distanceDisplayConditionAndDisableDepth.x;\n\
+    float farSq = distanceDisplayConditionAndDisableDepth.y;\n\
     if (lengthSq < nearSq || lengthSq > farSq) {\n\
         positionEC.xyz = vec3(0.0);\n\
     }\n\
@@ -154,6 +154,25 @@ void main()\n\
     vec4 positionWC = czm_eyeToWindowCoordinates(positionEC);\n\
 \n\
     gl_Position = czm_viewportOrthographic * vec4(positionWC.xy, -positionWC.z, 1.0);\n\
+\n\
+#ifdef DISABLE_DEPTH_DISTANCE\n\
+    float disableDepthTestDistance = distanceDisplayConditionAndDisableDepth.z;\n\
+    if (disableDepthTestDistance == 0.0 && czm_minimumDisableDepthTestDistance != 0.0)\n\
+    {\n\
+        disableDepthTestDistance = czm_minimumDisableDepthTestDistance;\n\
+    }\n\
+\n\
+    if (disableDepthTestDistance != 0.0)\n\
+    {\n\
+        gl_Position.z = min(gl_Position.z, gl_Position.w);\n\
+\n\
+        bool clipped = gl_Position.z < -gl_Position.w || gl_Position.z > gl_Position.w;\n\
+        if (!clipped && (disableDepthTestDistance < 0.0 || (lengthSq > 0.0 && lengthSq < disableDepthTestDistance)))\n\
+        {\n\
+            gl_Position.z = -gl_Position.w;\n\
+        }\n\
+    }\n\
+#endif\n\
 \n\
     v_color = color;\n\
     v_color.a *= translucency;\n\
