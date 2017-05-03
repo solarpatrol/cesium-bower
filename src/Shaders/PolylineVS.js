@@ -19,8 +19,9 @@ attribute vec4 texCoordExpandAndBatchIndex;\n\
 varying vec2  v_st;\n\
 varying float v_width;\n\
 varying vec4  czm_pickColor;\n\
+varying float v_angle;\n\
 \n\
-void main() \n\
+void main()\n\
 {\n\
     float texCoord = texCoordExpandAndBatchIndex.x;\n\
     float expandDir = texCoordExpandAndBatchIndex.y;\n\
@@ -37,7 +38,7 @@ void main() \n\
     }\n\
 \n\
     vec4 pickColor = batchTable_getPickColor(batchTableIndex);\n\
-    \n\
+\n\
     vec4 p, prev, next;\n\
     if (czm_morphTime == 1.0)\n\
     {\n\
@@ -92,10 +93,10 @@ void main() \n\
             show = 0.0;\n\
         }\n\
     #endif\n\
-    \n\
-    vec4 positionWC = getPolylineWindowCoordinates(p, prev, next, expandDir, width, usePrev);\n\
+\n\
+    vec4 positionWC = getPolylineWindowCoordinates(p, prev, next, expandDir, width, usePrev, v_angle);\n\
     gl_Position = czm_viewportOrthographic * positionWC * show;\n\
-    \n\
+\n\
     v_st = vec2(texCoord, clamp(expandDir, 0.0, 1.0));\n\
     v_width = width;\n\
     czm_pickColor = pickColor;\n\

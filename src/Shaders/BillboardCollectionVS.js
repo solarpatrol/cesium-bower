@@ -7,13 +7,13 @@ attribute vec2 direction;\n\
 #endif\n\
 attribute vec4 positionHighAndScale;\n\
 attribute vec4 positionLowAndRotation;\n\
-attribute vec4 compressedAttribute0;        // pixel offset, translate, horizontal origin, vertical origin, show, direction, texture coordinates (texture offset)\n\
-attribute vec4 compressedAttribute1;        // aligned axis, translucency by distance, image width\n\
-attribute vec4 compressedAttribute2;        // image height, color, pick color, size in meters, valid aligned axis, 13 bits free\n\
-attribute vec4 eyeOffset;                   // eye offset in meters, 4 bytes free (texture range)\n\
-attribute vec4 scaleByDistance;             // near, nearScale, far, farScale\n\
-attribute vec4 pixelOffsetScaleByDistance;  // near, nearScale, far, farScale\n\
-attribute vec2 distanceDisplayCondition;    // near, far\n\
+attribute vec4 compressedAttribute0;                       // pixel offset, translate, horizontal origin, vertical origin, show, direction, texture coordinates (texture offset)\n\
+attribute vec4 compressedAttribute1;                       // aligned axis, translucency by distance, image width\n\
+attribute vec4 compressedAttribute2;                       // image height, color, pick color, size in meters, valid aligned axis, 13 bits free\n\
+attribute vec4 eyeOffset;                                  // eye offset in meters, 4 bytes free (texture range)\n\
+attribute vec4 scaleByDistance;                            // near, nearScale, far, farScale\n\
+attribute vec4 pixelOffsetScaleByDistance;                 // near, nearScale, far, farScale\n\
+attribute vec3 distanceDisplayConditionAndDisableDepth;    // near, far, disableDepthTestDistance\n\
 \n\
 varying vec2 v_textureCoordinates;\n\
 \n\
@@ -209,7 +209,7 @@ void main()\n\
 \n\
     ///////////////////////////////////////////////////////////////////////////\n\
 \n\
-#if defined(EYE_DISTANCE_SCALING) || defined(EYE_DISTANCE_TRANSLUCENCY) || defined(EYE_DISTANCE_PIXEL_OFFSET) || defined(DISTANCE_DISPLAY_CONDITION)\n\
+#if defined(EYE_DISTANCE_SCALING) || defined(EYE_DISTANCE_TRANSLUCENCY) || defined(EYE_DISTANCE_PIXEL_OFFSET) || defined(DISTANCE_DISPLAY_CONDITION) || defined(DISABLE_DEPTH_DISTANCE)\n\
     float lengthSq;\n\
     if (czm_sceneMode == czm_sceneMode2D)\n\
     {\n\
@@ -250,8 +250,8 @@ void main()\n\
 #endif\n\
 \n\
 #ifdef DISTANCE_DISPLAY_CONDITION\n\
-    float nearSq = distanceDisplayCondition.x * distanceDisplayCondition.x;\n\
-    float farSq = distanceDisplayCondition.y * distanceDisplayCondition.y;\n\
+    float nearSq = distanceDisplayConditionAndDisableDepth.x;\n\
+    float farSq = distanceDisplayConditionAndDisableDepth.y;\n\
     if (lengthSq < nearSq || lengthSq > farSq)\n\
     {\n\
         positionEC.xyz = vec3(0.0);\n\
@@ -261,6 +261,25 @@ void main()\n\
     vec4 positionWC = computePositionWindowCoordinates(positionEC, imageSize, scale, direction, origin, translate, pixelOffset, alignedAxis, validAlignedAxis, rotation, sizeInMeters);\n\
     gl_Position = czm_viewportOrthographic * vec4(positionWC.xy, -positionWC.z, 1.0);\n\
     v_textureCoordinates = textureCoordinates;\n\
+\n\
+#ifdef DISABLE_DEPTH_DISTANCE\n\
+    float disableDepthTestDistance = distanceDisplayConditionAndDisableDepth.z;\n\
+    if (disableDepthTestDistance == 0.0 && czm_minimumDisableDepthTestDistance != 0.0)\n\
+    {\n\
+        disableDepthTestDistance = czm_minimumDisableDepthTestDistance;\n\
+    }\n\
+\n\
+    if (disableDepthTestDistance != 0.0)\n\
+    {\n\
+        gl_Position.z = min(gl_Position.z, gl_Position.w);\n\
+\n\
+        bool clipped = gl_Position.z < -gl_Position.w || gl_Position.z > gl_Position.w;\n\
+        if (!clipped && (disableDepthTestDistance < 0.0 || (lengthSq > 0.0 && lengthSq < disableDepthTestDistance)))\n\
+        {\n\
+            gl_Position.z = -gl_Position.w;\n\
+        }\n\
+    }\n\
+#endif\n\
 \n\
 #ifdef RENDER_FOR_PICK\n\
     v_pickColor = pickColor;\n\

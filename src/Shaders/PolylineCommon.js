@@ -11,13 +11,13 @@ define(function() {
 {\n\
     culledByNearPlane = false;\n\
     clipped = false;\n\
-    \n\
+\n\
     vec3 p1ToP0 = p1 - p0;\n\
     float magnitude = length(p1ToP0);\n\
     vec3 direction = normalize(p1ToP0);\n\
     float endPoint0Distance =  -(czm_currentFrustum.x + p0.z);\n\
     float denominator = -direction.z;\n\
-    \n\
+\n\
     if (endPoint0Distance < 0.0 && abs(denominator) < czm_epsilon7)\n\
     {\n\
         culledByNearPlane = true;\n\
@@ -36,30 +36,50 @@ define(function() {
             clipped = true;\n\
         }\n\
     }\n\
-    \n\
+\n\
     positionWC = czm_eyeToWindowCoordinates(vec4(p0, 1.0));\n\
 }\n\
 \n\
-vec4 getPolylineWindowCoordinates(vec4 position, vec4 previous, vec4 next, float expandDirection, float width, bool usePrevious) {\n\
+vec4 getPolylineWindowCoordinates(vec4 position, vec4 previous, vec4 next, float expandDirection, float width, bool usePrevious, out float angle) {\n\
     vec4 endPointWC, p0, p1;\n\
     bool culledByNearPlane, clipped;\n\
-    \n\
+\n\
     vec4 positionEC = czm_modelViewRelativeToEye * position;\n\
     vec4 prevEC = czm_modelViewRelativeToEye * previous;\n\
     vec4 nextEC = czm_modelViewRelativeToEye * next;\n\
-    \n\
+\n\
+    // Compute the window coordinates of the points.\n\
+    vec4 positionWindow = czm_eyeToWindowCoordinates(positionEC);\n\
+    vec4 previousWindow = czm_eyeToWindowCoordinates(prevEC);\n\
+    vec4 nextWindow = czm_eyeToWindowCoordinates(nextEC);\n\
+\n\
+#ifdef POLYLINE_DASH\n\
+    // Determine the relative screen space direction of the line.\n\
+    vec2 lineDir;\n\
+    if (usePrevious) {\n\
+        lineDir = normalize(positionWindow.xy - previousWindow.xy);\n\
+    }\n\
+    else {\n\
+        lineDir = normalize(nextWindow.xy - positionWindow.xy);\n\
+    }\n\
+    angle = atan(lineDir.x, lineDir.y) - 1.570796327; // precomputed atan(1,0)\n\
+\n\
+    // Quantize the angle so it doesn't change rapidly between segments.\n\
+    angle = floor(angle / czm_piOverFour + 0.5) * czm_piOverFour;\n\
+#endif\n\
+\n\
     clipLineSegmentToNearPlane(prevEC.xyz, positionEC.xyz, p0, clipped, culledByNearPlane);\n\
     clipLineSegmentToNearPlane(nextEC.xyz, positionEC.xyz, p1, clipped, culledByNearPlane);\n\
     clipLineSegmentToNearPlane(positionEC.xyz, usePrevious ? prevEC.xyz : nextEC.xyz, endPointWC, clipped, culledByNearPlane);\n\
-    \n\
+\n\
     if (culledByNearPlane)\n\
     {\n\
         return vec4(0.0, 0.0, 0.0, 1.0);\n\
     }\n\
-    \n\
+\n\
     vec2 prevWC = normalize(p0.xy - endPointWC.xy);\n\
     vec2 nextWC = normalize(p1.xy - endPointWC.xy);\n\
-    \n\
+\n\
     float expandWidth = width * 0.5;\n\
     vec2 direction;\n\
 \n\
