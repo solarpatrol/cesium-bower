@@ -55,11 +55,9 @@ vec4 computePositionWindowCoordinates(vec4 positionEC, vec2 imageSize, float sca
         float angle = rotation;\n\
         if (validAlignedAxis)\n\
         {\n\
-            vec3 pos = positionEC.xyz + czm_encodedCameraPositionMCHigh + czm_encodedCameraPositionMCLow;\n\
-            vec3 normal = normalize(cross(alignedAxis, pos));\n\
-            vec4 tangent = vec4(normalize(cross(pos, normal)), 0.0);\n\
-            tangent = czm_modelViewProjection * tangent;\n\
-            angle += sign(-tangent.x) * acos(tangent.y / length(tangent.xy));\n\
+            vec4 projectedAlignedAxis = czm_modelViewProjection * vec4(alignedAxis, 0.0);\n\
+            angle += sign(-projectedAlignedAxis.x) * acos( sign(projectedAlignedAxis.y) * (projectedAlignedAxis.y * projectedAlignedAxis.y) /\n\
+                    (projectedAlignedAxis.x * projectedAlignedAxis.x + projectedAlignedAxis.y * projectedAlignedAxis.y) );\n\
         }\n\
 \n\
         float cosTheta = cos(angle);\n\
@@ -78,7 +76,7 @@ vec4 computePositionWindowCoordinates(vec4 positionEC, vec2 imageSize, float sca
 \n\
     if (sizeInMeters)\n\
     {\n\
-        originTranslate += originTranslate / czm_metersPerPixel(positionEC);\n\
+        originTranslate /= czm_metersPerPixel(positionEC);\n\
     }\n\
 \n\
     positionWC.xy += originTranslate;\n\
