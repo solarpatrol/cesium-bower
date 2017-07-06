@@ -27,7 +27,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 //This file is automatically rebuilt by the Cesium build process.
-/*global define*/
 define(function() {
     'use strict';
     return "/**\n\

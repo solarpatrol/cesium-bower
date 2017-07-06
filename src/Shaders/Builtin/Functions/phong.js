@@ -1,5 +1,4 @@
 //This file is automatically rebuilt by the Cesium build process.
-/*global define*/
 define(function() {
     'use strict';
     return "float czm_private_getLambertDiffuseOfMaterial(vec3 lightDirectionEC, czm_material material)\n\
