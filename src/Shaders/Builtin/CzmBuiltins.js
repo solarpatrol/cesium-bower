@@ -1,5 +1,4 @@
 //This file is automatically rebuilt by the Cesium build process.
-/*global define*/
 define([
         './Constants/degreesPerRadian',
         './Constants/depthRange',
@@ -13,6 +12,7 @@ define([
         './Constants/infinity',
         './Constants/oneOverPi',
         './Constants/oneOverTwoPi',
+        './Constants/passCesium3DTile',
         './Constants/passCompute',
         './Constants/passEnvironment',
         './Constants/passGlobe',
@@ -108,6 +108,7 @@ define([
         czm_infinity,
         czm_oneOverPi,
         czm_oneOverTwoPi,
+        czm_passCesium3DTile,
         czm_passCompute,
         czm_passEnvironment,
         czm_passGlobe,
@@ -204,6 +205,7 @@ define([
         czm_infinity : czm_infinity,
         czm_oneOverPi : czm_oneOverPi,
         czm_oneOverTwoPi : czm_oneOverTwoPi,
+        czm_passCesium3DTile : czm_passCesium3DTile,
         czm_passCompute : czm_passCompute,
         czm_passEnvironment : czm_passEnvironment,
         czm_passGlobe : czm_passGlobe,

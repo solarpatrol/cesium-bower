@@ -1,5 +1,4 @@
 //This file is automatically rebuilt by the Cesium build process.
-/*global define*/
 define(function() {
     'use strict';
     return "/**\n\
@@ -10,6 +9,6 @@ define(function() {
  *\n\
  * @see czm_pass\n\
  */\n\
-const float czm_passOpaque = 4.0;\n\
+const float czm_passOpaque = 5.0;\n\
 ";
 });
