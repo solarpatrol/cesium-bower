@@ -69,7 +69,7 @@ varying vec3 v_mieColor;\n\
 \n\
 vec4 sampleAndBlend(\n\
     vec4 previousColor,\n\
-    sampler2D texture,\n\
+    sampler2D textureToSample,\n\
     vec2 tileTextureCoordinates,\n\
     vec4 textureCoordinateRectangle,\n\
     vec4 textureCoordinateTranslationAndScale,\n\
@@ -97,7 +97,7 @@ vec4 sampleAndBlend(\n\
     vec2 translation = textureCoordinateTranslationAndScale.xy;\n\
     vec2 scale = textureCoordinateTranslationAndScale.zw;\n\
     vec2 textureCoordinates = tileTextureCoordinates * scale + translation;\n\
-    vec4 value = texture2D(texture, textureCoordinates);\n\
+    vec4 value = texture2D(textureToSample, textureCoordinates);\n\
     vec3 color = value.rgb;\n\
     float alpha = value.a;\n\
 \n\

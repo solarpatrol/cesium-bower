@@ -5,7 +5,7 @@ define(function() {
 uniform vec4 gapColor;\n\
 uniform float dashLength;\n\
 uniform float dashPattern;\n\
-varying float v_angle;\n\
+varying float v_polylineAngle;\n\
 \n\
 const float maskLength = 16.0;\n\
 \n\
@@ -22,7 +22,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)\n\
 {\n\
     czm_material material = czm_getDefaultMaterial(materialInput);\n\
 \n\
-    vec2 pos = rotate(v_angle) * gl_FragCoord.xy;\n\
+    vec2 pos = rotate(v_polylineAngle) * gl_FragCoord.xy;\n\
 \n\
     // Get the relative position within the dash from 0 to 1\n\
     float dashPosition = fract(pos.x / dashLength);\n\
