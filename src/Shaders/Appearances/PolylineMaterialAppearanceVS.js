@@ -13,7 +13,7 @@ attribute float batchId;\n\
 \n\
 varying float v_width;\n\
 varying vec2 v_st;\n\
-varying float v_angle;\n\
+varying float v_polylineAngle;\n\
 \n\
 void main()\n\
 {\n\
@@ -28,7 +28,7 @@ void main()\n\
     v_width = width;\n\
     v_st = st;\n\
 \n\
-    vec4 positionWC = getPolylineWindowCoordinates(p, prev, next, expandDir, width, usePrev, v_angle);\n\
+    vec4 positionWC = getPolylineWindowCoordinates(p, prev, next, expandDir, width, usePrev, v_polylineAngle);\n\
     gl_Position = czm_viewportOrthographic * positionWC;\n\
 }\n\
 ";
