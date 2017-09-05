@@ -2,13 +2,13 @@
 define(function() {
     'use strict';
     return "/**\n\
- * The automatic GLSL constant for {@link Pass#GROUND}\n\
+ * The automatic GLSL constant for {@link Pass#TERRAIN_CLASSIFICATION}\n\
  *\n\
- * @name czm_passGround\n\
+ * @name czm_passTerrainClassification\n\
  * @glslConstant\n\
  *\n\
  * @see czm_pass\n\
  */\n\
-const float czm_passGround = 4.0;\n\
+const float czm_passTerrainClassification = 3.0;\n\
 ";
 });
