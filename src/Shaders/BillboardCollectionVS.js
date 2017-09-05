@@ -268,11 +268,12 @@ void main()\n\
 \n\
     if (disableDepthTestDistance != 0.0)\n\
     {\n\
-        gl_Position.z = min(gl_Position.z, gl_Position.w);\n\
-\n\
-        bool clipped = gl_Position.z < -gl_Position.w || gl_Position.z > gl_Position.w;\n\
+        // Don't try to \"multiply both sides\" by w.  Greater/less-than comparisons won't work for negative values of w.\n\
+        float zclip = gl_Position.z / gl_Position.w;\n\
+        bool clipped = (zclip < -1.0 || zclip > 1.0);\n\
         if (!clipped && (disableDepthTestDistance < 0.0 || (lengthSq > 0.0 && lengthSq < disableDepthTestDistance)))\n\
         {\n\
+            // Position z on the near plane.\n\
             gl_Position.z = -gl_Position.w;\n\
         }\n\
     }\n\
