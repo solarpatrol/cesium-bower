@@ -9,6 +9,6 @@ define(function() {
  *\n\
  * @see czm_pass\n\
  */\n\
-const float czm_passOverlay = 8.0;\n\
+const float czm_passOverlay = 9.0;\n\
 ";
 });
