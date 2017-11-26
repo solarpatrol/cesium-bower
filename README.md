@@ -1,5 +1,7 @@
 # Cesium
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/solarpatrol/cesium-bower.svg)](https://greenkeeper.io/)
+
 This is a [Bower](http://bower.io/) package for amazing [Cesium](http://cesiumjs.org) JavaScript library
 for creating 3D globes and 2D maps in a web browser without a plugin.
 
