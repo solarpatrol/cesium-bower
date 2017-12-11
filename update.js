@@ -85,7 +85,7 @@ checkNodeVersion(function(err, check) {
     shell.exec('git add dist');
     shell.exec('git commit -m "dist directory is updated to ' + version + '."');
 
-    console.log('Commiting package.json...');
-    shell.exec('git add package.json');
-    shell.exec('git commit --allow-empty -m "Version bump."');
+    console.log('Commiting package.json and lock files...');
+    shell.exec('git add -A');
+    shell.exec('git commit --allow-empty -m "Version bump and lock update."');
 });
