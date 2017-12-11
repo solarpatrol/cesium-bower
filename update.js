@@ -1,6 +1,7 @@
 var shell = require('shelljs'),
     path = require('path'),
-    jsonfile = require('jsonfile');
+    jsonfile = require('jsonfile'),
+    checkNodeVersion = require('check-node-version');
 
 // Parsing console arguments
 var argv = require('minimist')(process.argv.slice(2)),
@@ -34,41 +35,57 @@ packageJson.version = version;
 packageJson.devDependencies.cesium = version;
 jsonfile.writeFileSync(packageJsonFilePath, packageJson, { spaces: 2 });
 
-// Updating Cesium library
-console.log('Updating Cesium library to ' + version + '...');
-if (shell.exec('npm update').code !== 0) {
-    process.exit(3);
-}
+// Checking NPM and Yarn version
+checkNodeVersion(function(err, check) {
+    if (err) {
+        console.error('Unable to determine NPM and Yarn versions.');
+        process.exit(3);
+    }
 
-// Copying source and build files
-var fs = require('fs-extra');
+    var updateCommand;
+    if (check.versions.yarn.version) {
+        updateCommand = 'yarn';
+    }
+    else if (check.versions.npm.isSatisfied) {
+        updateCommand = 'npm update';
+    }
 
-var srcDirPath = path.resolve(__dirname, 'src'),
-    distDirPath = path.resolve(__dirname, 'dist');
+    // Updating Cesium library
+    console.log('Updating Cesium library to ' + version + '...');
+    if (shell.exec(updateCommand).code !== 0) {
+        process.exit(4);
+    }
 
-var cesiumDirPath = path.resolve(__dirname, 'node_modules', 'cesium'),
-    cesiumSrcDirPath = path.resolve(cesiumDirPath, 'Source'),
-    cesiumDistDirPath = path.resolve(cesiumDirPath, 'Build', 'Cesium');
+    // Copying source and build files
+    var fs = require('fs-extra');
 
-console.log('Copying source files...');
-fs.emptyDirSync(srcDirPath);
-fs.copySync(cesiumSrcDirPath, srcDirPath);
+    var srcDirPath = path.resolve(__dirname, 'src'),
+        distDirPath = path.resolve(__dirname, 'dist');
 
-console.log('Copying build files...');
-fs.emptyDirSync(distDirPath);
-fs.copySync(cesiumDistDirPath, distDirPath);
+    var cesiumDirPath = path.resolve(__dirname, 'node_modules', 'cesium'),
+        cesiumSrcDirPath = path.resolve(cesiumDirPath, 'Source'),
+        cesiumDistDirPath = path.resolve(cesiumDirPath, 'Build', 'Cesium');
 
-// Commiting changes
-shell.exec('git reset --mixed');
+    console.log('Copying source files...');
+    fs.emptyDirSync(srcDirPath);
+    fs.copySync(cesiumSrcDirPath, srcDirPath);
 
-console.log('Commiting source files...');
-shell.exec('git add src');
-shell.exec('git commit -m "src directory is updated to ' + version + '."');
+    console.log('Copying build files...');
+    fs.emptyDirSync(distDirPath);
+    fs.copySync(cesiumDistDirPath, distDirPath);
 
-console.log('Commiting build files...');
-shell.exec('git add dist');
-shell.exec('git commit -m "dist directory is updated to ' + version + '."');
+    // Commiting changes
+    shell.exec('git reset --mixed');
 
-console.log('Commiting package.json...');
-shell.exec('git add package.json');
-shell.exec('git commit --allow-empty -m "Version bump."');
+    console.log('Commiting source files...');
+    shell.exec('git add src');
+    shell.exec('git commit -m "src directory is updated to ' + version + '."');
+
+    console.log('Commiting build files...');
+    shell.exec('git add dist');
+    shell.exec('git commit -m "dist directory is updated to ' + version + '."');
+
+    console.log('Commiting package.json and lock files...');
+    shell.exec('git add -A');
+    shell.exec('git commit --allow-empty -m "Version bump and lock update."');
+});

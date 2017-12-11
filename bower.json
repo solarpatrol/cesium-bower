@@ -22,6 +22,6 @@
   ],
   "license": "MIT",
   "ignore": [
-    "cesium"
+    "node_modules"
   ]
 }
