@@ -25,6 +25,11 @@ varying vec3 v_textureCoordinates;\n\
 varying vec3 v_normalMC;\n\
 varying vec3 v_normalEC;\n\
 \n\
+#ifdef APPLY_MATERIAL\n\
+varying float v_slope;\n\
+varying float v_height;\n\
+#endif\n\
+\n\
 #ifdef FOG\n\
 varying float v_distance;\n\
 varying vec3 v_mieColor;\n\
@@ -157,7 +162,8 @@ void main()\n\
 #if defined(ENABLE_VERTEX_LIGHTING) || defined(GENERATE_POSITION_AND_NORMAL)\n\
     v_positionEC = (u_modifiedModelView * vec4(position, 1.0)).xyz;\n\
     v_positionMC = position3DWC;                                 // position in model coordinates\n\
-    v_normalMC = czm_octDecode(encodedNormal);\n\
+    vec3 normalMC = czm_octDecode(encodedNormal);\n\
+    v_normalMC = normalMC;\n\
     v_normalEC = czm_normal3D * v_normalMC;\n\
 #elif defined(SHOW_REFLECTIVE_OCEAN) || defined(ENABLE_DAYNIGHT_SHADING) || defined(GENERATE_POSITION)\n\
     v_positionEC = (u_modifiedModelView * vec4(position, 1.0)).xyz;\n\
@@ -169,6 +175,13 @@ void main()\n\
     v_mieColor = atmosColor.mie;\n\
     v_rayleighColor = atmosColor.rayleigh;\n\
     v_distance = length((czm_modelView3D * vec4(position3DWC, 1.0)).xyz);\n\
+#endif\n\
+\n\
+#ifdef APPLY_MATERIAL\n\
+    vec3 finalNormal = normalMC;\n\
+    vec3 ellipsoidNormal = normalize(position3DWC.xyz);\n\
+    v_slope = abs(dot(ellipsoidNormal, finalNormal));\n\
+    v_height = height;\n\
 #endif\n\
 }\n\
 ";
