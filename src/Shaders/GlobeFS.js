@@ -55,6 +55,12 @@ uniform sampler2D u_oceanNormalMap;\n\
 uniform vec2 u_lightingFadeDistance;\n\
 #endif\n\
 \n\
+#ifdef ENABLE_CLIPPING_PLANES\n\
+uniform int u_clippingPlanesLength;\n\
+uniform vec4 u_clippingPlanes[czm_maxClippingPlanes];\n\
+uniform vec4 u_clippingPlanesEdgeStyle;\n\
+#endif\n\
+\n\
 #if defined(FOG) && (defined(ENABLE_VERTEX_LIGHTING) || defined(ENABLE_DAYNIGHT_SHADING))\n\
 uniform float u_minimumBrightness;\n\
 #endif\n\
@@ -153,6 +159,14 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 \n\
 void main()\n\
 {\n\
+#ifdef ENABLE_CLIPPING_PLANES\n\
+    #ifdef UNION_CLIPPING_REGIONS\n\
+    float clipDistance = czm_discardIfClippedWithUnion(u_clippingPlanes, u_clippingPlanesLength);\n\
+    #else\n\
+    float clipDistance = czm_discardIfClippedWithIntersect(u_clippingPlanes, u_clippingPlanesLength);\n\
+    #endif\n\
+#endif\n\
+\n\
     // The clamp below works around an apparent bug in Chrome Canary v23.0.1241.0\n\
     // where the fragment shader sees textures coordinates < 0.0 and > 1.0 for the\n\
     // fragments on the edges of tiles even though the vertex shader is outputting\n\
@@ -215,6 +229,17 @@ void main()\n\
     vec4 finalColor = vec4(color.rgb * diffuseIntensity, color.a);\n\
 #else\n\
     vec4 finalColor = color;\n\
+#endif\n\
+\n\
+#ifdef ENABLE_CLIPPING_PLANES\n\
+    vec4 clippingPlanesEdgeColor = vec4(1.0);\n\
+    clippingPlanesEdgeColor.rgb = u_clippingPlanesEdgeStyle.rgb;\n\
+    float clippingPlanesEdgeWidth = u_clippingPlanesEdgeStyle.a;\n\
+\n\
+    if (clipDistance < clippingPlanesEdgeWidth)\n\
+    {\n\
+        finalColor = clippingPlanesEdgeColor;\n\
+    }\n\
 #endif\n\
 \n\
 #ifdef FOG\n\
