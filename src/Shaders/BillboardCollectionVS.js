@@ -13,6 +13,9 @@ attribute vec4 eyeOffset;                                  // eye offset in mete
 attribute vec4 scaleByDistance;                            // near, nearScale, far, farScale\n\
 attribute vec4 pixelOffsetScaleByDistance;                 // near, nearScale, far, farScale\n\
 attribute vec3 distanceDisplayConditionAndDisableDepth;    // near, far, disableDepthTestDistance\n\
+#ifdef VECTOR_TILE\n\
+attribute float a_batchId;\n\
+#endif\n\
 \n\
 varying vec2 v_textureCoordinates;\n\
 \n\

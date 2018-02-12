@@ -16,6 +16,7 @@ define([
         './Constants/passCesium3DTile',
         './Constants/passCesium3DTileClassification',
         './Constants/passCesium3DTileClassificationIgnoreShow',
+        './Constants/passClassification',
         './Constants/passCompute',
         './Constants/passEnvironment',
         './Constants/passGlobe',
@@ -54,6 +55,7 @@ define([
         './Functions/computePosition',
         './Functions/cosineAndSine',
         './Functions/decompressTextureCoordinates',
+        './Functions/depthClampFarPlane',
         './Functions/discardIfClippedWithIntersect',
         './Functions/discardIfClippedWithUnion',
         './Functions/eastNorthUpToEyeCoordinates',
@@ -99,6 +101,7 @@ define([
         './Functions/transpose',
         './Functions/unpackDepth',
         './Functions/windowToEyeCoordinates',
+        './Functions/writeDepthClampedToFarPlane',
         './Functions/XYZToRGB'
     ], function(
         czm_degreesPerRadian,
@@ -117,6 +120,7 @@ define([
         czm_passCesium3DTile,
         czm_passCesium3DTileClassification,
         czm_passCesium3DTileClassificationIgnoreShow,
+        czm_passClassification,
         czm_passCompute,
         czm_passEnvironment,
         czm_passGlobe,
@@ -155,6 +159,7 @@ define([
         czm_computePosition,
         czm_cosineAndSine,
         czm_decompressTextureCoordinates,
+        czm_depthClampFarPlane,
         czm_discardIfClippedWithIntersect,
         czm_discardIfClippedWithUnion,
         czm_eastNorthUpToEyeCoordinates,
@@ -200,6 +205,7 @@ define([
         czm_transpose,
         czm_unpackDepth,
         czm_windowToEyeCoordinates,
+        czm_writeDepthClampedToFarPlane,
         czm_XYZToRGB) {
                            'use strict';
                            return {
@@ -219,6 +225,7 @@ define([
         czm_passCesium3DTile : czm_passCesium3DTile,
         czm_passCesium3DTileClassification : czm_passCesium3DTileClassification,
         czm_passCesium3DTileClassificationIgnoreShow : czm_passCesium3DTileClassificationIgnoreShow,
+        czm_passClassification : czm_passClassification,
         czm_passCompute : czm_passCompute,
         czm_passEnvironment : czm_passEnvironment,
         czm_passGlobe : czm_passGlobe,
@@ -257,6 +264,7 @@ define([
         czm_computePosition : czm_computePosition,
         czm_cosineAndSine : czm_cosineAndSine,
         czm_decompressTextureCoordinates : czm_decompressTextureCoordinates,
+        czm_depthClampFarPlane : czm_depthClampFarPlane,
         czm_discardIfClippedWithIntersect : czm_discardIfClippedWithIntersect,
         czm_discardIfClippedWithUnion : czm_discardIfClippedWithUnion,
         czm_eastNorthUpToEyeCoordinates : czm_eastNorthUpToEyeCoordinates,
@@ -302,5 +310,6 @@ define([
         czm_transpose : czm_transpose,
         czm_unpackDepth : czm_unpackDepth,
         czm_windowToEyeCoordinates : czm_windowToEyeCoordinates,
+        czm_writeDepthClampedToFarPlane : czm_writeDepthClampedToFarPlane,
         czm_XYZToRGB : czm_XYZToRGB};
 });
