@@ -3,6 +3,10 @@ define(function() {
     'use strict';
     return "uniform sampler2D u_atlas;\n\
 \n\
+#ifdef VECTOR_TILE\n\
+uniform vec4 u_highlightColor;\n\
+#endif\n\
+\n\
 varying vec2 v_textureCoordinates;\n\
 \n\
 #ifdef RENDER_FOR_PICK\n\
@@ -41,6 +45,10 @@ void main()\n\
         discard;\n\
     }\n\
 #endif\n\
+#endif\n\
+\n\
+#ifdef VECTOR_TILE\n\
+    color *= u_highlightColor;\n\
 #endif\n\
 \n\
 #ifdef RENDER_FOR_PICK\n\
