@@ -2,8 +2,9 @@
 define(function() {
     'use strict';
     return "// emulated noperspective\n\
+#ifndef LOG_DEPTH\n\
 varying float v_WindowZ;\n\
-\n\
+#endif\n\
 /**\n\
  * Clamps a vertex to the far plane by writing the fragments depth.\n\
  * <p>\n\
@@ -21,7 +22,7 @@ varying float v_WindowZ;\n\
  */\n\
 void czm_writeDepthClampedToFarPlane()\n\
 {\n\
-#ifdef GL_EXT_frag_depth\n\
+#if defined(GL_EXT_frag_depth) && !defined(LOG_DEPTH)\n\
     gl_FragDepthEXT = min(v_WindowZ * gl_FragCoord.w, 1.0);\n\
 #endif\n\
 }\n\

@@ -17,10 +17,11 @@ void main()\n\
 \n\
     czm_material material = czm_getMaterial(materialInput);\n\
     gl_FragColor = vec4(material.diffuse + material.emission, material.alpha);\n\
-\n\
 #ifdef VECTOR_TILE\n\
     gl_FragColor *= u_highlightColor;\n\
 #endif\n\
+\n\
+    czm_writeLogDepth();\n\
 }\n\
 ";
 });

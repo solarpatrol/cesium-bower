@@ -2,7 +2,6 @@
 define(function() {
     'use strict';
     return "//#define SHOW_TILE_BOUNDARIES\n\
-\n\
 uniform vec4 u_initialColor;\n\
 \n\
 #if TEXTURE_UNITS > 0\n\
@@ -186,6 +185,7 @@ void main()\n\
     vec2 waterMaskTranslation = u_waterMaskTranslationAndScale.xy;\n\
     vec2 waterMaskScale = u_waterMaskTranslationAndScale.zw;\n\
     vec2 waterMaskTextureCoordinates = v_textureCoordinates.xy * waterMaskScale + waterMaskTranslation;\n\
+    waterMaskTextureCoordinates.y = 1.0 - waterMaskTextureCoordinates.y;\n\
 \n\
     float mask = texture2D(u_waterMask, waterMaskTextureCoordinates).r;\n\
 \n\

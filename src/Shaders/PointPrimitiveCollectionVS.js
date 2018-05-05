@@ -150,8 +150,11 @@ void main()\n\
     }\n\
 #endif\n\
 \n\
-    vec4 positionWC = czm_eyeToWindowCoordinates(positionEC);\n\
+#ifdef LOG_DEPTH\n\
+    czm_vertexLogDepth(czm_projection * positionEC);\n\
+#endif\n\
 \n\
+    vec4 positionWC = czm_eyeToWindowCoordinates(positionEC);\n\
     gl_Position = czm_viewportOrthographic * vec4(positionWC.xy, -positionWC.z, 1.0);\n\
 \n\
 #ifdef DISABLE_DEPTH_DISTANCE\n\
@@ -170,6 +173,9 @@ void main()\n\
         {\n\
             // Position z on the near plane.\n\
             gl_Position.z = -gl_Position.w;\n\
+#ifdef LOG_DEPTH\n\
+            czm_vertexLogDepth(vec4(czm_currentFrustum.x));\n\
+#endif\n\
         }\n\
     }\n\
 #endif\n\
