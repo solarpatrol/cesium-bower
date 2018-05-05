@@ -28,27 +28,30 @@ void main()\n\
     {\n\
         discard;\n\
     }\n\
-    else\n\
-    {\n\
-        vec4 color = texture2D(u_pointCloud_colorTexture, v_textureCoordinates);\n\
 \n\
-        // sample from neighbors up, down, left, right\n\
-        float distX = u_distancesAndEdlStrength.x;\n\
-        float distY = u_distancesAndEdlStrength.y;\n\
+    vec4 color = texture2D(u_pointCloud_colorTexture, v_textureCoordinates);\n\
 \n\
-        vec2 responseAndCount = vec2(0.0);\n\
+    // sample from neighbors up, down, left, right\n\
+    float distX = u_distancesAndEdlStrength.x;\n\
+    float distY = u_distancesAndEdlStrength.y;\n\
 \n\
-        responseAndCount += neighborContribution(ecAlphaDepth.a, vec2(0, distY));\n\
-        responseAndCount += neighborContribution(ecAlphaDepth.a, vec2(distX, 0));\n\
-        responseAndCount += neighborContribution(ecAlphaDepth.a, vec2(0, -distY));\n\
-        responseAndCount += neighborContribution(ecAlphaDepth.a, vec2(-distX, 0));\n\
+    vec2 responseAndCount = vec2(0.0);\n\
 \n\
-        float response = responseAndCount.x / responseAndCount.y;\n\
-        float shade = exp(-response * 300.0 * u_distancesAndEdlStrength.z);\n\
-        color.rgb *= shade;\n\
-        gl_FragColor = vec4(color);\n\
-        gl_FragDepthEXT = czm_eyeToWindowCoordinates(vec4(ecAlphaDepth.xyz, 1.0)).z;\n\
-    }\n\
+    responseAndCount += neighborContribution(ecAlphaDepth.a, vec2(0, distY));\n\
+    responseAndCount += neighborContribution(ecAlphaDepth.a, vec2(distX, 0));\n\
+    responseAndCount += neighborContribution(ecAlphaDepth.a, vec2(0, -distY));\n\
+    responseAndCount += neighborContribution(ecAlphaDepth.a, vec2(-distX, 0));\n\
+\n\
+    float response = responseAndCount.x / responseAndCount.y;\n\
+    float shade = exp(-response * 300.0 * u_distancesAndEdlStrength.z);\n\
+    color.rgb *= shade;\n\
+    gl_FragColor = vec4(color);\n\
+\n\
+#ifdef LOG_DEPTH\n\
+    czm_writeLogDepth(1.0 + (czm_projection * vec4(ecAlphaDepth.xyz, 1.0)).w);\n\
+#else\n\
+    gl_FragDepthEXT = czm_eyeToWindowCoordinates(vec4(ecAlphaDepth.xyz, 1.0)).z;\n\
+#endif\n\
 }\n\
 ";
 });

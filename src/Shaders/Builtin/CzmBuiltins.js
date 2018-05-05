@@ -85,6 +85,7 @@ define([
         './Functions/phong',
         './Functions/pointAlongRay',
         './Functions/rayEllipsoidIntersectionInterval',
+        './Functions/reverseLogDepth',
         './Functions/RGBToHSB',
         './Functions/RGBToHSL',
         './Functions/RGBToXYZ',
@@ -99,8 +100,10 @@ define([
         './Functions/transpose',
         './Functions/unpackDepth',
         './Functions/unpackFloat',
+        './Functions/vertexLogDepth',
         './Functions/windowToEyeCoordinates',
         './Functions/writeDepthClampedToFarPlane',
+        './Functions/writeLogDepth',
         './Functions/XYZToRGB'
     ], function(
         czm_degreesPerRadian,
@@ -188,6 +191,7 @@ define([
         czm_phong,
         czm_pointAlongRay,
         czm_rayEllipsoidIntersectionInterval,
+        czm_reverseLogDepth,
         czm_RGBToHSB,
         czm_RGBToHSL,
         czm_RGBToXYZ,
@@ -202,8 +206,10 @@ define([
         czm_transpose,
         czm_unpackDepth,
         czm_unpackFloat,
+        czm_vertexLogDepth,
         czm_windowToEyeCoordinates,
         czm_writeDepthClampedToFarPlane,
+        czm_writeLogDepth,
         czm_XYZToRGB) {
                            'use strict';
                            return {
@@ -292,6 +298,7 @@ define([
         czm_phong : czm_phong,
         czm_pointAlongRay : czm_pointAlongRay,
         czm_rayEllipsoidIntersectionInterval : czm_rayEllipsoidIntersectionInterval,
+        czm_reverseLogDepth : czm_reverseLogDepth,
         czm_RGBToHSB : czm_RGBToHSB,
         czm_RGBToHSL : czm_RGBToHSL,
         czm_RGBToXYZ : czm_RGBToXYZ,
@@ -306,7 +313,9 @@ define([
         czm_transpose : czm_transpose,
         czm_unpackDepth : czm_unpackDepth,
         czm_unpackFloat : czm_unpackFloat,
+        czm_vertexLogDepth : czm_vertexLogDepth,
         czm_windowToEyeCoordinates : czm_windowToEyeCoordinates,
         czm_writeDepthClampedToFarPlane : czm_writeDepthClampedToFarPlane,
+        czm_writeLogDepth : czm_writeLogDepth,
         czm_XYZToRGB : czm_XYZToRGB};
 });
