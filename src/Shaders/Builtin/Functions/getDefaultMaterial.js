@@ -7,10 +7,10 @@ define(function() {
  * The default normal value is given by materialInput.normalEC.\n\
  *\n\
  * @name czm_getDefaultMaterial\n\
- * @glslFunction \n\
+ * @glslFunction\n\
  *\n\
  * @param {czm_materialInput} input The input used to construct the default material.\n\
- * \n\
+ *\n\
  * @returns {czm_material} The default material.\n\
  *\n\
  * @see czm_materialInput\n\
