@@ -19,9 +19,9 @@ brace-expansion@^1.1.7:
     balanced-match "^1.0.0"
     concat-map "0.0.1"
 
-cesium@1.45.0:
-  version "1.45.0"
-  resolved "https://registry.yarnpkg.com/cesium/-/cesium-1.45.0.tgz#3f967dcea57b97a42878ec775e57d076b3861e49"
+cesium@1.46.1:
+  version "1.46.1"
+  resolved "https://registry.yarnpkg.com/cesium/-/cesium-1.46.1.tgz#2a7259c5ac3c911aa7cc915c55f3f17fa3849706"
   dependencies:
     requirejs "^2.3.2"
 
