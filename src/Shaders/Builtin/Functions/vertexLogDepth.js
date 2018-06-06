@@ -17,7 +17,7 @@ void czm_updatePositionDepth() {\n\
     }\n\
 #endif\n\
 \n\
-    gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * czm_logFarDistance - 1.0;\n\
+    gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * czm_log2FarDistance - 1.0;\n\
     gl_Position.z *= gl_Position.w;\n\
 #endif\n\
 }\n\

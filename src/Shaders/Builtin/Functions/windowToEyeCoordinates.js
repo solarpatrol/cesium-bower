@@ -56,5 +56,42 @@ vec4 czm_windowToEyeCoordinates(vec4 fragmentCoordinate)\n\
 \n\
     return q;\n\
 }\n\
+\n\
+/**\n\
+ * Transforms a position given as window x/y and a depth or a log depth from window to eye coordinates.\n\
+ * This function produces more accurate results for window positions with log depth than\n\
+ * conventionally unpacking the log depth using czm_reverseLogDepth and using the standard version\n\
+ * of czm_windowToEyeCoordinates.\n\
+ *\n\
+ * @name czm_windowToEyeCoordinates\n\
+ * @glslFunction\n\
+ *\n\
+ * @param {vec2} fragmentCoordinateXY The XY position in window coordinates to transform.\n\
+ * @param {float} depthOrLogDepth A depth or log depth for the fragment.\n\
+ *\n\
+ * @see czm_modelToWindowCoordinates\n\
+ * @see czm_eyeToWindowCoordinates\n\
+ * @see czm_inverseProjection\n\
+ * @see czm_viewport\n\
+ * @see czm_viewportTransformation\n\
+ *\n\
+ * @returns {vec4} The transformed position in eye coordinates.\n\
+ */\n\
+vec4 czm_windowToEyeCoordinates(vec2 fragmentCoordinateXY, float depthOrLogDepth)\n\
+{\n\
+    // See reverseLogDepth.glsl. This is separate to re-use the pow.\n\
+#ifdef LOG_DEPTH\n\
+    float near = czm_currentFrustum.x;\n\
+    float far = czm_currentFrustum.y;\n\
+    float unscaledDepth = pow(2.0, depthOrLogDepth * czm_log2FarPlusOne) - 1.0;\n\
+    vec4 windowCoord = vec4(fragmentCoordinateXY, far * (1.0 - near / unscaledDepth) / (far - near), 1.0);\n\
+    vec4 eyeCoordinate = czm_windowToEyeCoordinates(windowCoord);\n\
+    eyeCoordinate.w = 1.0 / unscaledDepth; // Better precision\n\
+#else\n\
+    vec4 windowCoord = vec4(fragmentCoordinateXY, depthOrLogDepth, 1.0);\n\
+    vec4 eyeCoordinate = czm_windowToEyeCoordinates(windowCoord);\n\
+#endif\n\
+    return eyeCoordinate;\n\
+}\n\
 ";
 });
