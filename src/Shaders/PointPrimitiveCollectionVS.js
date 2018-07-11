@@ -14,10 +14,7 @@ varying vec4 v_color;\n\
 varying vec4 v_outlineColor;\n\
 varying float v_innerPercent;\n\
 varying float v_pixelDistance;\n\
-\n\
-#ifdef RENDER_FOR_PICK\n\
 varying vec4 v_pickColor;\n\
-#endif\n\
 \n\
 const float SHIFT_LEFT8 = 256.0;\n\
 const float SHIFT_RIGHT8 = 1.0 / 256.0;\n\
@@ -55,18 +52,16 @@ void main()\n\
 \n\
     vec4 color;\n\
     vec4 outlineColor;\n\
-#ifdef RENDER_FOR_PICK\n\
+    vec4 pickColor;\n\
+\n\
     // compressedAttribute0.z => pickColor.rgb\n\
 \n\
-    color = vec4(0.0);\n\
-    outlineColor = vec4(0.0);\n\
-    vec4 pickColor;\n\
     temp = compressedAttribute0.z * SHIFT_RIGHT8;\n\
     pickColor.b = (temp - floor(temp)) * SHIFT_LEFT8;\n\
     temp = floor(temp) * SHIFT_RIGHT8;\n\
     pickColor.g = (temp - floor(temp)) * SHIFT_LEFT8;\n\
     pickColor.r = floor(temp);\n\
-#else\n\
+\n\
     // compressedAttribute0.x => color.rgb\n\
 \n\
     temp = compressedAttribute0.x * SHIFT_RIGHT8;\n\
@@ -82,15 +77,13 @@ void main()\n\
     temp = floor(temp) * SHIFT_RIGHT8;\n\
     outlineColor.g = (temp - floor(temp)) * SHIFT_LEFT8;\n\
     outlineColor.r = floor(temp);\n\
-#endif\n\
 \n\
     // compressedAttribute0.w => color.a, outlineColor.a, pickColor.a\n\
 \n\
     temp = compressedAttribute0.w * SHIFT_RIGHT8;\n\
-#ifdef RENDER_FOR_PICK\n\
     pickColor.a = (temp - floor(temp)) * SHIFT_LEFT8;\n\
     pickColor = pickColor / 255.0;\n\
-#endif\n\
+\n\
     temp = floor(temp) * SHIFT_RIGHT8;\n\
     outlineColor.a = (temp - floor(temp)) * SHIFT_LEFT8;\n\
     outlineColor /= 255.0;\n\
@@ -189,9 +182,7 @@ void main()\n\
     v_pixelDistance = 2.0 / totalSize;\n\
     gl_PointSize = totalSize;\n\
 \n\
-#ifdef RENDER_FOR_PICK\n\
     v_pickColor = pickColor;\n\
-#endif\n\
 }\n\
 ";
 });

@@ -9,7 +9,8 @@ varying vec2 v_textureCoordinates;\n\
 void main(void)\n\
 {\n\
     vec4 silhouetteColor = texture2D(silhouetteTexture, v_textureCoordinates);\n\
-    gl_FragColor = mix(texture2D(colorTexture, v_textureCoordinates), silhouetteColor, silhouetteColor.a);\n\
+    vec4 color = texture2D(colorTexture, v_textureCoordinates);\n\
+    gl_FragColor = mix(color, silhouetteColor, silhouetteColor.a);\n\
 }\n\
 ";
 });

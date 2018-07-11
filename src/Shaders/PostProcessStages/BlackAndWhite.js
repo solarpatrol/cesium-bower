@@ -9,6 +9,12 @@ varying vec2 v_textureCoordinates;\n\
 void main(void)\n\
 {\n\
     vec3 rgb = texture2D(colorTexture, v_textureCoordinates).rgb;\n\
+#ifdef CZM_SELECTED_FEATURE\n\
+    if (czm_selected()) {\n\
+        gl_FragColor = vec4(rgb, 1.0);\n\
+        return;\n\
+    }\n\
+#endif\n\
     float luminance = czm_luminance(rgb);\n\
     float darkness = luminance * gradations;\n\
     darkness = (darkness - fract(darkness)) / gradations;\n\

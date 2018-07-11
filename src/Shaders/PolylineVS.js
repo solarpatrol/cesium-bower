@@ -17,7 +17,7 @@ attribute vec4 texCoordExpandAndBatchIndex;\n\
 \n\
 varying vec2  v_st;\n\
 varying float v_width;\n\
-varying vec4  czm_pickColor;\n\
+varying vec4 v_pickColor;\n\
 varying float v_polylineAngle;\n\
 \n\
 void main()\n\
@@ -98,7 +98,7 @@ void main()\n\
 \n\
     v_st = vec2(texCoord, clamp(expandDir, 0.0, 1.0));\n\
     v_width = width;\n\
-    czm_pickColor = pickColor;\n\
+    v_pickColor = pickColor;\n\
 \n\
 #ifdef LOG_DEPTH\n\
     czm_vertexLogDepth(czm_modelViewProjectionRelativeToEye * p);\n\
