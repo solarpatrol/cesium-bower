@@ -3,15 +3,21 @@ define(function() {
     'use strict';
     return "#ifdef LOG_DEPTH\n\
 varying float v_logZ;\n\
+#ifdef SHADOW_MAP\n\
 varying vec3 v_logPositionEC;\n\
+#endif\n\
 #endif\n\
 \n\
 void czm_updatePositionDepth() {\n\
 #if defined(LOG_DEPTH) && !defined(DISABLE_GL_POSITION_LOG_DEPTH)\n\
-    v_logPositionEC = (czm_inverseProjection * gl_Position).xyz;\n\
+    vec3 logPositionEC = (czm_inverseProjection * gl_Position).xyz;\n\
+\n\
+#ifdef SHADOW_MAP\n\
+    v_logPositionEC = logPositionEC;\n\
+#endif\n\
 \n\
 #ifdef ENABLE_GL_POSITION_LOG_DEPTH_AT_HEIGHT\n\
-    if (length(v_logPositionEC) < 2.0e6)\n\
+    if (length(logPositionEC) < 2.0e6)\n\
     {\n\
         return;\n\
     }\n\
