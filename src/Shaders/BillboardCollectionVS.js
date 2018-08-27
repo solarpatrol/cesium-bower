@@ -13,19 +13,18 @@ attribute vec4 eyeOffset;                                  // eye offset in mete
 attribute vec4 scaleByDistance;                            // near, nearScale, far, farScale\n\
 attribute vec4 pixelOffsetScaleByDistance;                 // near, nearScale, far, farScale\n\
 attribute vec4 compressedAttribute3;                       // distance display condition near, far, disableDepthTestDistance, dimensions\n\
-#ifdef CLAMP_TO_GROUND\n\
-attribute vec4 textureCoordinateBounds;                    // the min and max x and y values for the texture coordinates\n\
+#if defined(VERTEX_DEPTH_CHECK) || defined(FRAGMENT_DEPTH_CHECK)\n\
+attribute vec4 textureCoordinateBoundsOrLabelTranslate;    // the min and max x and y values for the texture coordinates\n\
 #endif\n\
 #ifdef VECTOR_TILE\n\
 attribute float a_batchId;\n\
 #endif\n\
 \n\
 varying vec2 v_textureCoordinates;\n\
-#ifdef CLAMP_TO_GROUND\n\
+#ifdef FRAGMENT_DEPTH_CHECK\n\
 varying vec4 v_textureCoordinateBounds;\n\
 varying vec4 v_originTextureCoordinateAndTranslate;\n\
-varying vec4 v_dimensionsAndImageSize;\n\
-varying vec3 v_eyeDepthDistanceAndApplyTranslate;\n\
+varying vec4 v_compressed;                                 // x: eyeDepth, y: applyTranslate & enableDepthCheck, z: dimensions, w: imageSize\n\
 varying mat2 v_rotationMatrix;\n\
 #endif\n\
 \n\
@@ -51,6 +50,76 @@ const float SHIFT_RIGHT3 = 1.0 / 8.0;\n\
 const float SHIFT_RIGHT2 = 1.0 / 4.0;\n\
 const float SHIFT_RIGHT1 = 1.0 / 2.0;\n\
 \n\
+vec4 addScreenSpaceOffset(vec4 positionEC, vec2 imageSize, float scale, vec2 direction, vec2 origin, vec2 translate, vec2 pixelOffset, vec3 alignedAxis, bool validAlignedAxis, float rotation, bool sizeInMeters, out mat2 rotationMatrix, out float mpp)\n\
+{\n\
+    // Note the halfSize cannot be computed in JavaScript because it is sent via\n\
+    // compressed vertex attributes that coerce it to an integer.\n\
+    vec2 halfSize = imageSize * scale * czm_resolutionScale * 0.5;\n\
+    halfSize *= ((direction * 2.0) - 1.0);\n\
+\n\
+    vec2 originTranslate = origin * abs(halfSize);\n\
+\n\
+#if defined(ROTATION) || defined(ALIGNED_AXIS)\n\
+    if (validAlignedAxis || rotation != 0.0)\n\
+    {\n\
+        float angle = rotation;\n\
+        if (validAlignedAxis)\n\
+        {\n\
+            vec4 projectedAlignedAxis = czm_modelViewProjection * vec4(alignedAxis, 0.0);\n\
+            angle += sign(-projectedAlignedAxis.x) * acos(sign(projectedAlignedAxis.y) * (projectedAlignedAxis.y * projectedAlignedAxis.y) /\n\
+                    (projectedAlignedAxis.x * projectedAlignedAxis.x + projectedAlignedAxis.y * projectedAlignedAxis.y));\n\
+        }\n\
+\n\
+        float cosTheta = cos(angle);\n\
+        float sinTheta = sin(angle);\n\
+        rotationMatrix = mat2(cosTheta, sinTheta, -sinTheta, cosTheta);\n\
+        halfSize = rotationMatrix * halfSize;\n\
+    }\n\
+    else\n\
+    {\n\
+        rotationMatrix = mat2(1.0, 0.0, 0.0, 1.0);\n\
+    }\n\
+#endif\n\
+\n\
+    if (sizeInMeters)\n\
+    {\n\
+        positionEC.xy += halfSize;\n\
+    }\n\
+\n\
+    mpp = czm_metersPerPixel(positionEC);\n\
+\n\
+    if (!sizeInMeters)\n\
+    {\n\
+        originTranslate *= mpp;\n\
+    }\n\
+\n\
+    positionEC.xy += originTranslate;\n\
+    if (!sizeInMeters)\n\
+    {\n\
+        positionEC.xy += halfSize * mpp;\n\
+    }\n\
+\n\
+    positionEC.xy += translate * mpp;\n\
+    positionEC.xy += (pixelOffset * czm_resolutionScale) * mpp;\n\
+    return positionEC;\n\
+}\n\
+\n\
+#ifdef VERTEX_DEPTH_CHECK\n\
+float getGlobeDepth(vec4 positionEC)\n\
+{\n\
+    vec4 posWC = czm_eyeToWindowCoordinates(positionEC);\n\
+\n\
+    float globeDepth = czm_unpackDepth(texture2D(czm_globeDepthTexture, posWC.xy / czm_viewport.zw));\n\
+\n\
+    if (globeDepth == 0.0)\n\
+    {\n\
+        return 0.0; // not on the globe\n\
+    }\n\
+\n\
+    vec4 eyeCoordinate = czm_windowToEyeCoordinates(posWC.xy, globeDepth);\n\
+    return eyeCoordinate.z / eyeCoordinate.w;\n\
+}\n\
+#endif\n\
 void main()\n\
 {\n\
     // Modifying this shader may also require modifications to Billboard._computeScreenSpacePosition\n\
@@ -80,7 +149,7 @@ void main()\n\
     origin.y = floor(compressed * SHIFT_RIGHT3);\n\
     compressed -= origin.y * SHIFT_LEFT3;\n\
 \n\
-#ifdef CLAMP_TO_GROUND\n\
+#ifdef FRAGMENT_DEPTH_CHECK\n\
     vec2 depthOrigin = origin.xy;\n\
 #endif\n\
     origin -= vec2(1.0);\n\
@@ -117,7 +186,7 @@ void main()\n\
 \n\
     vec2 imageSize = vec2(floor(temp), temp2);\n\
 \n\
-#ifdef CLAMP_TO_GROUND\n\
+#ifdef FRAGMENT_DEPTH_CHECK\n\
     float labelHorizontalOrigin = floor(compressedAttribute2.w - (temp2 * SHIFT_LEFT2));\n\
     float applyTranslate = 0.0;\n\
     if (labelHorizontalOrigin != 0.0) // is a billboard, so set apply translate to false\n\
@@ -128,12 +197,6 @@ void main()\n\
     }\n\
 \n\
     depthOrigin = vec2(1.0) - (depthOrigin * 0.5);\n\
-\n\
-    temp = compressedAttribute3.w;\n\
-    temp = temp * SHIFT_RIGHT12;\n\
-    vec2 dimensions;\n\
-    dimensions.y = (temp - floor(temp)) * SHIFT_LEFT12;\n\
-    dimensions.x = floor(temp);\n\
 #endif\n\
 \n\
 #ifdef EYE_DISTANCE_TRANSLUCENCY\n\
@@ -145,6 +208,15 @@ void main()\n\
 \n\
     temp = compressedAttribute1.y * SHIFT_RIGHT8;\n\
     translucencyByDistance.w = ((temp - floor(temp)) * SHIFT_LEFT8) / 255.0;\n\
+#endif\n\
+\n\
+#if defined(VERTEX_DEPTH_CHECK) || defined(FRAGMENT_DEPTH_CHECK)\n\
+    temp = compressedAttribute3.w;\n\
+    temp = temp * SHIFT_RIGHT12;\n\
+\n\
+    vec2 dimensions;\n\
+    dimensions.y = (temp - floor(temp)) * SHIFT_LEFT12;\n\
+    dimensions.x = floor(temp);\n\
 #endif\n\
 \n\
 #ifdef ALIGNED_AXIS\n\
@@ -188,9 +260,8 @@ void main()\n\
     vec4 p = czm_translateRelativeToEye(positionHigh, positionLow);\n\
     vec4 positionEC = czm_modelViewRelativeToEye * p;\n\
 \n\
-#ifdef CLAMP_TO_GROUND\n\
+#if defined(FRAGMENT_DEPTH_CHECK) || defined(VERTEX_DEPTH_CHECK)\n\
     float eyeDepth = positionEC.z;\n\
-    v_rotationMatrix = mat2(1.0, 0.0, 0.0, 1.0);\n\
 #endif\n\
 \n\
     positionEC = czm_eyeOffset(positionEC, eyeOffset.xyz);\n\
@@ -247,55 +318,40 @@ void main()\n\
     }\n\
 #endif\n\
 \n\
-    // Note the halfSize cannot be computed in JavaScript because it is sent via\n\
-    // compressed vertex attributes that coerce it to an integer.\n\
-    vec2 halfSize = imageSize * scale * czm_resolutionScale * 0.5;\n\
-    halfSize *= ((direction * 2.0) - 1.0);\n\
+    mat2 rotationMatrix;\n\
+    float mpp;\n\
 \n\
-    vec2 originTranslate = origin * abs(halfSize);\n\
-\n\
-#if defined(ROTATION) || defined(ALIGNED_AXIS)\n\
-    if (validAlignedAxis || rotation != 0.0)\n\
-    {\n\
-        float angle = rotation;\n\
-        if (validAlignedAxis)\n\
-        {\n\
-            vec4 projectedAlignedAxis = czm_modelViewProjection * vec4(alignedAxis, 0.0);\n\
-            angle += sign(-projectedAlignedAxis.x) * acos( sign(projectedAlignedAxis.y) * (projectedAlignedAxis.y * projectedAlignedAxis.y) /\n\
-                    (projectedAlignedAxis.x * projectedAlignedAxis.x + projectedAlignedAxis.y * projectedAlignedAxis.y) );\n\
-        }\n\
-\n\
-        float cosTheta = cos(angle);\n\
-        float sinTheta = sin(angle);\n\
-        mat2 rotationMatrix = mat2(cosTheta, sinTheta, -sinTheta, cosTheta);\n\
-        halfSize = rotationMatrix * halfSize;\n\
-\n\
-        #ifdef CLAMP_TO_GROUND\n\
-            v_rotationMatrix = rotationMatrix;\n\
-        #endif\n\
-    }\n\
+#ifdef DISABLE_DEPTH_DISTANCE\n\
+    float disableDepthTestDistance = compressedAttribute3.z;\n\
 #endif\n\
 \n\
-    if (sizeInMeters)\n\
+#ifdef VERTEX_DEPTH_CHECK\n\
+if (lengthSq < disableDepthTestDistance) {\n\
+    float depthsilon = 10.0;\n\
+\n\
+    vec2 labelTranslate = textureCoordinateBoundsOrLabelTranslate.xy;\n\
+    vec4 pEC1 = addScreenSpaceOffset(positionEC, dimensions, scale, vec2(0.0), origin, labelTranslate, pixelOffset, alignedAxis, validAlignedAxis, rotation, sizeInMeters, rotationMatrix, mpp);\n\
+    float globeDepth1 = getGlobeDepth(pEC1);\n\
+\n\
+    if (globeDepth1 != 0.0 && pEC1.z + depthsilon < globeDepth1)\n\
     {\n\
-        positionEC.xy += halfSize;\n\
+        vec4 pEC2 = addScreenSpaceOffset(positionEC, dimensions, scale, vec2(0.0, 1.0), origin, labelTranslate, pixelOffset, alignedAxis, validAlignedAxis, rotation, sizeInMeters, rotationMatrix, mpp);\n\
+        float globeDepth2 = getGlobeDepth(pEC2);\n\
+\n\
+        if (globeDepth2 != 0.0 && pEC2.z + depthsilon < globeDepth2)\n\
+        {\n\
+            vec4 pEC3 = addScreenSpaceOffset(positionEC, dimensions, scale, vec2(1.0), origin, labelTranslate, pixelOffset, alignedAxis, validAlignedAxis, rotation, sizeInMeters, rotationMatrix, mpp);\n\
+            float globeDepth3 = getGlobeDepth(pEC3);\n\
+            if (globeDepth3 != 0.0 && pEC3.z + depthsilon < globeDepth3)\n\
+            {\n\
+                positionEC.xyz = vec3(0.0);\n\
+            }\n\
+        }\n\
     }\n\
+}\n\
+#endif\n\
 \n\
-    float mpp = czm_metersPerPixel(positionEC);\n\
-\n\
-    if (!sizeInMeters)\n\
-    {\n\
-        originTranslate *= mpp;\n\
-    }\n\
-\n\
-    positionEC.xy += originTranslate;\n\
-    if (!sizeInMeters)\n\
-    {\n\
-        positionEC.xy += halfSize * mpp;\n\
-    }\n\
-\n\
-    positionEC.xy += translate * mpp;\n\
-    positionEC.xy += (pixelOffset * czm_resolutionScale) * mpp;\n\
+    positionEC = addScreenSpaceOffset(positionEC, imageSize, scale, direction, origin, translate, pixelOffset, alignedAxis, validAlignedAxis, rotation, sizeInMeters, rotationMatrix, mpp);\n\
     gl_Position = czm_projection * positionEC;\n\
     v_textureCoordinates = textureCoordinates;\n\
 \n\
@@ -304,8 +360,6 @@ void main()\n\
 #endif\n\
 \n\
 #ifdef DISABLE_DEPTH_DISTANCE\n\
-    float disableDepthTestDistance = compressedAttribute3.z;\n\
-\n\
     if (disableDepthTestDistance == 0.0 && czm_minimumDisableDepthTestDistance != 0.0)\n\
     {\n\
         disableDepthTestDistance = czm_minimumDisableDepthTestDistance;\n\
@@ -327,20 +381,39 @@ void main()\n\
     }\n\
 #endif\n\
 \n\
-#ifdef CLAMP_TO_GROUND\n\
+#ifdef FRAGMENT_DEPTH_CHECK\n\
     if (sizeInMeters) {\n\
         translate /= mpp;\n\
         dimensions /= mpp;\n\
         imageSize /= mpp;\n\
     }\n\
-    v_eyeDepthDistanceAndApplyTranslate.x = eyeDepth;\n\
-    v_eyeDepthDistanceAndApplyTranslate.y = disableDepthTestDistance;\n\
-    v_eyeDepthDistanceAndApplyTranslate.z = applyTranslate;\n\
+\n\
+#if defined(ROTATION) || defined(ALIGNED_AXIS)\n\
+    v_rotationMatrix = rotationMatrix;\n\
+#else\n\
+    v_rotationMatrix = mat2(1.0, 0.0, 0.0, 1.0);\n\
+#endif\n\
+\n\
+    float enableDepthCheck = 0.0;\n\
+    if (lengthSq < disableDepthTestDistance)\n\
+    {\n\
+        enableDepthCheck = 1.0;\n\
+    }\n\
+\n\
+    float dw = floor(clamp(dimensions.x, 0.0, SHIFT_LEFT12));\n\
+    float dh = floor(clamp(dimensions.y, 0.0, SHIFT_LEFT12));\n\
+\n\
+    float iw = floor(clamp(imageSize.x, 0.0, SHIFT_LEFT12));\n\
+    float ih = floor(clamp(imageSize.y, 0.0, SHIFT_LEFT12));\n\
+\n\
+    v_compressed.x = eyeDepth;\n\
+    v_compressed.y = applyTranslate * SHIFT_LEFT1 + enableDepthCheck;\n\
+    v_compressed.z = dw * SHIFT_LEFT12 + dh;\n\
+    v_compressed.w = iw * SHIFT_LEFT12 + ih;\n\
     v_originTextureCoordinateAndTranslate.xy = depthOrigin;\n\
     v_originTextureCoordinateAndTranslate.zw = translate;\n\
-    v_textureCoordinateBounds = textureCoordinateBounds;\n\
-    v_dimensionsAndImageSize.xy = dimensions * scale;\n\
-    v_dimensionsAndImageSize.zw = imageSize * scale;\n\
+    v_textureCoordinateBounds = textureCoordinateBoundsOrLabelTranslate;\n\
+\n\
 #endif\n\
 \n\
     v_pickColor = pickColor;\n\
