@@ -143,12 +143,8 @@ void main()\n\
     }\n\
 #endif\n\
 \n\
-#ifdef LOG_DEPTH\n\
-    czm_vertexLogDepth(czm_projection * positionEC);\n\
-#endif\n\
-\n\
-    vec4 positionWC = czm_eyeToWindowCoordinates(positionEC);\n\
-    gl_Position = czm_viewportOrthographic * vec4(positionWC.xy, -positionWC.z, 1.0);\n\
+    gl_Position = czm_projection * positionEC;\n\
+    czm_vertexLogDepth();\n\
 \n\
 #ifdef DISABLE_DEPTH_DISTANCE\n\
     float disableDepthTestDistance = distanceDisplayConditionAndDisableDepth.z;\n\

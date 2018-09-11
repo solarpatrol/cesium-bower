@@ -13,7 +13,7 @@ varying vec2 v_inversePlaneExtents;\n\
 varying vec4 v_westPlane;\n\
 varying vec4 v_southPlane;\n\
 #endif // SPHERICAL\n\
-varying vec2 v_uvMin;\n\
+varying vec3 v_uvMinAndSphericalLongitudeRotation;\n\
 varying vec3 v_uMaxAndInverseDistance;\n\
 varying vec3 v_vMaxAndInverseDistance;\n\
 #endif // TEXTURE_COORDINATES\n\
@@ -61,6 +61,8 @@ void main(void)\n\
 #ifdef SPHERICAL\n\
     // Treat world coords as a sphere normal for spherical coordinates\n\
     vec2 sphericalLatLong = czm_approximateSphericalCoordinates(worldCoordinate);\n\
+    sphericalLatLong.y += v_uvMinAndSphericalLongitudeRotation.z;\n\
+    sphericalLatLong.y = czm_branchFreeTernary(sphericalLatLong.y < czm_pi, sphericalLatLong.y, sphericalLatLong.y - czm_twoPi);\n\
     uv.x = (sphericalLatLong.y - v_sphericalExtents.y) * v_sphericalExtents.w;\n\
     uv.y = (sphericalLatLong.x - v_sphericalExtents.x) * v_sphericalExtents.z;\n\
 #else // SPHERICAL\n\
@@ -134,8 +136,8 @@ void main(void)\n\
     // Remap texture coordinates from computed (approximately aligned with cartographic space) to the desired\n\
     // texture coordinate system, which typically forms a tight oriented bounding box around the geometry.\n\
     // Shader is provided a set of reference points for remapping.\n\
-    materialInput.st.x = czm_lineDistance(v_uvMin, v_uMaxAndInverseDistance.xy, uv) * v_uMaxAndInverseDistance.z;\n\
-    materialInput.st.y = czm_lineDistance(v_uvMin, v_vMaxAndInverseDistance.xy, uv) * v_vMaxAndInverseDistance.z;\n\
+    materialInput.st.x = czm_lineDistance(v_uvMinAndSphericalLongitudeRotation.xy, v_uMaxAndInverseDistance.xy, uv) * v_uMaxAndInverseDistance.z;\n\
+    materialInput.st.y = czm_lineDistance(v_uvMinAndSphericalLongitudeRotation.xy, v_vMaxAndInverseDistance.xy, uv) * v_vMaxAndInverseDistance.z;\n\
 #endif\n\
 \n\
     czm_material material = czm_getMaterial(materialInput);\n\
