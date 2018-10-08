@@ -1,8 +1,7 @@
 //This file is automatically rebuilt by the Cesium build process.
 define(function() {
     'use strict';
-    return "//#define SHOW_TILE_BOUNDARIES\n\
-uniform vec4 u_initialColor;\n\
+    return "uniform vec4 u_initialColor;\n\
 \n\
 #if TEXTURE_UNITS > 0\n\
 uniform sampler2D u_dayTextures[TEXTURE_UNITS];\n\
@@ -50,8 +49,16 @@ uniform float u_zoomedOutOceanSpecularIntensity;\n\
 uniform sampler2D u_oceanNormalMap;\n\
 #endif\n\
 \n\
-#ifdef ENABLE_DAYNIGHT_SHADING\n\
+#if defined(ENABLE_DAYNIGHT_SHADING) || defined(GROUND_ATMOSPHERE)\n\
 uniform vec2 u_lightingFadeDistance;\n\
+#endif\n\
+\n\
+#ifdef TILE_LIMIT_RECTANGLE\n\
+uniform vec4 u_cartographicLimitRectangle;\n\
+#endif\n\
+\n\
+#ifdef GROUND_ATMOSPHERE\n\
+uniform vec2 u_nightFadeDistance;\n\
 #endif\n\
 \n\
 #ifdef ENABLE_CLIPPING_PLANES\n\
@@ -60,7 +67,7 @@ uniform mat4 u_clippingPlanesMatrix;\n\
 uniform vec4 u_clippingPlanesEdgeStyle;\n\
 #endif\n\
 \n\
-#if defined(FOG) && (defined(ENABLE_VERTEX_LIGHTING) || defined(ENABLE_DAYNIGHT_SHADING))\n\
+#if defined(FOG) && (defined(ENABLE_VERTEX_LIGHTING) || defined(ENABLE_DAYNIGHT_SHADING)) || defined(GROUND_ATMOSPHERE)\n\
 uniform float u_minimumBrightness;\n\
 #endif\n\
 \n\
@@ -75,8 +82,13 @@ varying float v_height;\n\
 varying float v_slope;\n\
 #endif\n\
 \n\
-#ifdef FOG\n\
+#if defined(FOG) || defined(GROUND_ATMOSPHERE)\n\
 varying float v_distance;\n\
+varying vec3 v_fogRayleighColor;\n\
+varying vec3 v_fogMieColor;\n\
+#endif\n\
+\n\
+#ifdef GROUND_ATMOSPHERE\n\
 varying vec3 v_rayleighColor;\n\
 varying vec3 v_mieColor;\n\
 #endif\n\
@@ -154,10 +166,19 @@ vec4 sampleAndBlend(\n\
 }\n\
 \n\
 vec4 computeDayColor(vec4 initialColor, vec3 textureCoordinates);\n\
-vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat3 enuToEye, vec4 imageryColor, float specularMapValue);\n\
+vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat3 enuToEye, vec4 imageryColor, float specularMapValue, float fade);\n\
 \n\
 void main()\n\
 {\n\
+\n\
+#ifdef TILE_LIMIT_RECTANGLE\n\
+    if (v_textureCoordinates.x < u_cartographicLimitRectangle.x || u_cartographicLimitRectangle.z < v_textureCoordinates.x ||\n\
+        v_textureCoordinates.y < u_cartographicLimitRectangle.y || u_cartographicLimitRectangle.w < v_textureCoordinates.y)\n\
+        {\n\
+            discard;\n\
+        }\n\
+#endif\n\
+\n\
 #ifdef ENABLE_CLIPPING_PLANES\n\
     float clipDistance = clip(gl_FragCoord, u_clippingPlanes, u_clippingPlanesMatrix);\n\
 #endif\n\
@@ -181,42 +202,7 @@ void main()\n\
     vec3 normalEC = czm_normal3D * normalMC;                                         // normalized surface normal in eye coordiantes\n\
 #endif\n\
 \n\
-#ifdef SHOW_REFLECTIVE_OCEAN\n\
-    vec2 waterMaskTranslation = u_waterMaskTranslationAndScale.xy;\n\
-    vec2 waterMaskScale = u_waterMaskTranslationAndScale.zw;\n\
-    vec2 waterMaskTextureCoordinates = v_textureCoordinates.xy * waterMaskScale + waterMaskTranslation;\n\
-    waterMaskTextureCoordinates.y = 1.0 - waterMaskTextureCoordinates.y;\n\
-\n\
-    float mask = texture2D(u_waterMask, waterMaskTextureCoordinates).r;\n\
-\n\
-    if (mask > 0.0)\n\
-    {\n\
-        mat3 enuToEye = czm_eastNorthUpToEyeCoordinates(v_positionMC, normalEC);\n\
-\n\
-        vec2 ellipsoidTextureCoordinates = czm_ellipsoidWgs84TextureCoordinates(normalMC);\n\
-        vec2 ellipsoidFlippedTextureCoordinates = czm_ellipsoidWgs84TextureCoordinates(normalMC.zyx);\n\
-\n\
-        vec2 textureCoordinates = mix(ellipsoidTextureCoordinates, ellipsoidFlippedTextureCoordinates, czm_morphTime * smoothstep(0.9, 0.95, normalMC.z));\n\
-\n\
-        color = computeWaterColor(v_positionEC, textureCoordinates, enuToEye, color, mask);\n\
-    }\n\
-#endif\n\
-\n\
-#ifdef APPLY_MATERIAL\n\
-    czm_materialInput materialInput;\n\
-    materialInput.st = v_textureCoordinates.st;\n\
-    materialInput.normalEC = normalize(v_normalEC);\n\
-    materialInput.slope = v_slope;\n\
-    materialInput.height = v_height;\n\
-    czm_material material = czm_getMaterial(materialInput);\n\
-    color.xyz = mix(color.xyz, material.diffuse, material.alpha);\n\
-#endif\n\
-\n\
-#ifdef ENABLE_VERTEX_LIGHTING\n\
-    float diffuseIntensity = clamp(czm_getLambertDiffuse(czm_sunDirectionEC, normalize(v_normalEC)) * 0.9 + 0.3, 0.0, 1.0);\n\
-    vec4 finalColor = vec4(color.rgb * diffuseIntensity, color.a);\n\
-#elif defined(ENABLE_DAYNIGHT_SHADING)\n\
-    float diffuseIntensity = clamp(czm_getLambertDiffuse(czm_sunDirectionEC, normalEC) * 5.0 + 0.3, 0.0, 1.0);\n\
+#if defined(ENABLE_DAYNIGHT_SHADING) || defined(GROUND_ATMOSPHERE)\n\
     float cameraDist;\n\
     if (czm_sceneMode == czm_sceneMode2D)\n\
     {\n\
@@ -238,8 +224,48 @@ void main()\n\
         fadeOutDist -= maxRadii;\n\
         fadeInDist -= maxRadii;\n\
     }\n\
-    float t = clamp((cameraDist - fadeOutDist) / (fadeInDist - fadeOutDist), 0.0, 1.0);\n\
-    diffuseIntensity = mix(1.0, diffuseIntensity, t);\n\
+    float fade = clamp((cameraDist - fadeOutDist) / (fadeInDist - fadeOutDist), 0.0, 1.0);\n\
+#else\n\
+    float fade = 0.0;\n\
+#endif\n\
+\n\
+#ifdef SHOW_REFLECTIVE_OCEAN\n\
+    vec2 waterMaskTranslation = u_waterMaskTranslationAndScale.xy;\n\
+    vec2 waterMaskScale = u_waterMaskTranslationAndScale.zw;\n\
+    vec2 waterMaskTextureCoordinates = v_textureCoordinates.xy * waterMaskScale + waterMaskTranslation;\n\
+    waterMaskTextureCoordinates.y = 1.0 - waterMaskTextureCoordinates.y;\n\
+\n\
+    float mask = texture2D(u_waterMask, waterMaskTextureCoordinates).r;\n\
+\n\
+    if (mask > 0.0)\n\
+    {\n\
+        mat3 enuToEye = czm_eastNorthUpToEyeCoordinates(v_positionMC, normalEC);\n\
+\n\
+        vec2 ellipsoidTextureCoordinates = czm_ellipsoidWgs84TextureCoordinates(normalMC);\n\
+        vec2 ellipsoidFlippedTextureCoordinates = czm_ellipsoidWgs84TextureCoordinates(normalMC.zyx);\n\
+\n\
+        vec2 textureCoordinates = mix(ellipsoidTextureCoordinates, ellipsoidFlippedTextureCoordinates, czm_morphTime * smoothstep(0.9, 0.95, normalMC.z));\n\
+\n\
+        color = computeWaterColor(v_positionEC, textureCoordinates, enuToEye, color, mask, fade);\n\
+    }\n\
+#endif\n\
+\n\
+#ifdef APPLY_MATERIAL\n\
+    czm_materialInput materialInput;\n\
+    materialInput.st = v_textureCoordinates.st;\n\
+    materialInput.normalEC = normalize(v_normalEC);\n\
+    materialInput.slope = v_slope;\n\
+    materialInput.height = v_height;\n\
+    czm_material material = czm_getMaterial(materialInput);\n\
+    color.xyz = mix(color.xyz, material.diffuse, material.alpha);\n\
+#endif\n\
+\n\
+#if defined(ENABLE_VERTEX_LIGHTING)\n\
+    float diffuseIntensity = clamp(czm_getLambertDiffuse(czm_sunDirectionEC, normalize(v_normalEC)) * 0.9 + 0.3, 0.0, 1.0);\n\
+    vec4 finalColor = vec4(color.rgb * diffuseIntensity, color.a);\n\
+#elif defined(ENABLE_DAYNIGHT_SHADING)\n\
+    float diffuseIntensity = clamp(czm_getLambertDiffuse(czm_sunDirectionEC, normalEC) * 5.0 + 0.3, 0.0, 1.0);\n\
+    diffuseIntensity = mix(1.0, diffuseIntensity, fade);\n\
     vec4 finalColor = vec4(color.rgb * diffuseIntensity, color.a);\n\
 #else\n\
     vec4 finalColor = color;\n\
@@ -256,20 +282,60 @@ void main()\n\
     }\n\
 #endif\n\
 \n\
-#ifdef FOG\n\
+#if defined(FOG) || defined(GROUND_ATMOSPHERE)\n\
     const float fExposure = 2.0;\n\
-    vec3 fogColor = v_mieColor + finalColor.rgb * v_rayleighColor;\n\
+    vec3 fogColor = v_fogMieColor + finalColor.rgb * v_fogRayleighColor;\n\
     fogColor = vec3(1.0) - exp(-fExposure * fogColor);\n\
+#endif\n\
 \n\
+#ifdef FOG\n\
 #if defined(ENABLE_VERTEX_LIGHTING) || defined(ENABLE_DAYNIGHT_SHADING)\n\
     float darken = clamp(dot(normalize(czm_viewerPositionWC), normalize(czm_sunPositionWC)), u_minimumBrightness, 1.0);\n\
     fogColor *= darken;\n\
 #endif\n\
 \n\
-    gl_FragColor = vec4(czm_fog(v_distance, finalColor.rgb, fogColor), finalColor.a);\n\
-#else\n\
-    gl_FragColor = finalColor;\n\
+    finalColor = vec4(czm_fog(v_distance, finalColor.rgb, fogColor), finalColor.a);\n\
 #endif\n\
+\n\
+#ifdef GROUND_ATMOSPHERE\n\
+    if (czm_sceneMode != czm_sceneMode3D)\n\
+    {\n\
+        gl_FragColor = finalColor;\n\
+        return;\n\
+    }\n\
+\n\
+#if defined(PER_FRAGMENT_GROUND_ATMOSPHERE) && (defined(ENABLE_DAYNIGHT_SHADING) || defined(ENABLE_VERTEX_LIGHTING))\n\
+    czm_ellipsoid ellipsoid = czm_getWgs84EllipsoidEC();\n\
+\n\
+    float mpp = czm_metersPerPixel(vec4(0.0, 0.0, -czm_currentFrustum.x, 1.0));\n\
+    vec2 xy = gl_FragCoord.xy / czm_viewport.zw * 2.0 - vec2(1.0);\n\
+    xy *= czm_viewport.zw * mpp * 0.5;\n\
+\n\
+    vec3 direction = normalize(vec3(xy, -czm_currentFrustum.x));\n\
+    czm_ray ray = czm_ray(vec3(0.0), direction);\n\
+\n\
+    czm_raySegment intersection = czm_rayEllipsoidIntersectionInterval(ray, ellipsoid);\n\
+\n\
+    vec3 ellipsoidPosition = czm_pointAlongRay(ray, intersection.start);\n\
+    ellipsoidPosition = (czm_inverseView * vec4(ellipsoidPosition, 1.0)).xyz;\n\
+    AtmosphereColor atmosColor = computeGroundAtmosphereFromSpace(ellipsoidPosition, true);\n\
+\n\
+    vec3 groundAtmosphereColor = atmosColor.mie + finalColor.rgb * atmosColor.rayleigh;\n\
+    groundAtmosphereColor = vec3(1.0) - exp(-fExposure * groundAtmosphereColor);\n\
+\n\
+    fadeInDist = u_nightFadeDistance.x;\n\
+    fadeOutDist = u_nightFadeDistance.y;\n\
+\n\
+    float sunlitAtmosphereIntensity = clamp((cameraDist - fadeOutDist) / (fadeInDist - fadeOutDist), 0.0, 1.0);\n\
+    groundAtmosphereColor = mix(groundAtmosphereColor, fogColor, sunlitAtmosphereIntensity);\n\
+#else\n\
+    vec3 groundAtmosphereColor = fogColor;\n\
+#endif\n\
+\n\
+    finalColor = vec4(mix(finalColor.rgb, groundAtmosphereColor, fade), finalColor.a);\n\
+#endif\n\
+\n\
+    gl_FragColor = finalColor;\n\
 }\n\
 \n\
 #ifdef SHOW_REFLECTIVE_OCEAN\n\
@@ -299,7 +365,7 @@ const float oceanFrequencyHighAltitude = 125000.0;\n\
 const float oceanAnimationSpeedHighAltitude = 0.008;\n\
 const float oceanOneOverAmplitudeHighAltitude = 1.0 / 2.0;\n\
 \n\
-vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat3 enuToEye, vec4 imageryColor, float maskValue)\n\
+vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat3 enuToEye, vec4 imageryColor, float maskValue, float fade)\n\
 {\n\
     vec3 positionToEyeEC = -positionEyeCoordinates;\n\
     float positionToEyeECLength = length(positionToEyeEC);\n\
@@ -342,7 +408,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 \n\
     // Use diffuse light to highlight the waves\n\
     float diffuseIntensity = czm_getLambertDiffuse(czm_sunDirectionEC, normalEC) * maskValue;\n\
-    vec3 diffuseHighlight = waveHighlightColor * diffuseIntensity;\n\
+    vec3 diffuseHighlight = waveHighlightColor * diffuseIntensity * (1.0 - fade);\n\
 \n\
 #ifdef SHOW_OCEAN_WAVES\n\
     // Where diffuse light is low or non-existent, use wave highlights based solely on\n\
