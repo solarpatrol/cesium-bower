@@ -92,8 +92,6 @@ void main (void)\n\
 \n\
     vec3 rgb = rayleighPhase * v_rayleighColor + miePhase * v_mieColor;\n\
     rgb = vec3(1.0) - exp(-exposure * rgb);\n\
-    // Compute luminance before color correction to avoid strangely gray night skies\n\
-    float l = czm_luminance(rgb);\n\
 \n\
 #ifdef COLOR_CORRECT\n\
     // Convert rgb color to hsb\n\
@@ -104,9 +102,6 @@ void main (void)\n\
     hsb.z = hsb.z > czm_epsilon7 ? hsb.z + u_hsbShift.z : 0.0; // brightness\n\
     // Convert shifted hsb back to rgb\n\
     rgb = czm_HSBToRGB(hsb);\n\
-\n\
-    // Check if correction decreased the luminance to 0\n\
-    l = min(l, czm_luminance(rgb));\n\
 #endif\n\
 \n\
     // Alter alpha based on how close the viewer is to the ground (1.0 = on ground, 0.0 = at edge of atmosphere)\n\

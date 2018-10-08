@@ -30,10 +30,10 @@ varying float v_slope;\n\
 varying float v_height;\n\
 #endif\n\
 \n\
-#ifdef FOG\n\
+#if defined(FOG) || defined(GROUND_ATMOSPHERE)\n\
 varying float v_distance;\n\
-varying vec3 v_mieColor;\n\
-varying vec3 v_rayleighColor;\n\
+varying vec3 v_fogMieColor;\n\
+varying vec3 v_fogRayleighColor;\n\
 #endif\n\
 \n\
 // These functions are generated at runtime.\n\
@@ -161,19 +161,19 @@ void main()\n\
 \n\
 #if defined(ENABLE_VERTEX_LIGHTING) || defined(GENERATE_POSITION_AND_NORMAL) || defined(APPLY_MATERIAL)\n\
     v_positionEC = (u_modifiedModelView * vec4(position, 1.0)).xyz;\n\
-    v_positionMC = position3DWC;                                 // position in model coordinates\n\
+    v_positionMC = position3DWC;  // position in model coordinates\n\
     vec3 normalMC = czm_octDecode(encodedNormal);\n\
     v_normalMC = normalMC;\n\
     v_normalEC = czm_normal3D * v_normalMC;\n\
 #elif defined(SHOW_REFLECTIVE_OCEAN) || defined(ENABLE_DAYNIGHT_SHADING) || defined(GENERATE_POSITION)\n\
     v_positionEC = (u_modifiedModelView * vec4(position, 1.0)).xyz;\n\
-    v_positionMC = position3DWC;                                 // position in model coordinates\n\
+    v_positionMC = position3DWC;  // position in model coordinates\n\
 #endif\n\
 \n\
-#ifdef FOG\n\
-    AtmosphereColor atmosColor = computeGroundAtmosphereFromSpace(position3DWC);\n\
-    v_mieColor = atmosColor.mie;\n\
-    v_rayleighColor = atmosColor.rayleigh;\n\
+#if defined(FOG) || defined(GROUND_ATMOSPHERE)\n\
+    AtmosphereColor atmosFogColor = computeGroundAtmosphereFromSpace(position3DWC, false);\n\
+    v_fogMieColor = atmosFogColor.mie;\n\
+    v_fogRayleighColor = atmosFogColor.rayleigh;\n\
     v_distance = length((czm_modelView3D * vec4(position3DWC, 1.0)).xyz);\n\
 #endif\n\
 \n\
