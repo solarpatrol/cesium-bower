@@ -12,7 +12,7 @@ uniform vec4 u_highlightColor;\n\
 void main(void)\n\
 {\n\
 #ifdef VECTOR_TILE\n\
-    gl_FragColor = u_highlightColor;\n\
+    gl_FragColor = czm_gammaCorrect(u_highlightColor);\n\
 #else\n\
     gl_FragColor = vec4(1.0);\n\
 #endif\n\

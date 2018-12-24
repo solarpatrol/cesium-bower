@@ -79,11 +79,25 @@ vec4 getPolylineWindowCoordinatesEC(vec4 positionEC, vec4 prevEC, vec4 nextEC, f
     float expandWidth = width * 0.5;\n\
     vec2 direction;\n\
 \n\
+#ifdef CLIP_POLYLINE\n\
+    if (clipped)\n\
+    {\n\
+        if (prevEC.z - positionEC.z < 0.0)\n\
+        {\n\
+            direction = vec2(prevWC.y, -prevWC.x);\n\
+        }\n\
+        else\n\
+        {\n\
+            direction = vec2(-prevWC.y, prevWC.x);\n\
+        }\n\
+    }\n\
+    else\n\
+#endif\n\
     if (czm_equalsEpsilon(prevEC.xyz - positionEC.xyz, vec3(0.0), czm_epsilon1) || czm_equalsEpsilon(prevWC, -nextWC, czm_epsilon1))\n\
     {\n\
         direction = vec2(-nextWC.y, nextWC.x);\n\
     }\n\
-    else if (czm_equalsEpsilon(nextEC.xyz - positionEC.xyz, vec3(0.0), czm_epsilon1) || clipped)\n\
+    else if (czm_equalsEpsilon(nextEC.xyz - positionEC.xyz, vec3(0.0), czm_epsilon1))\n\
     {\n\
         direction = vec2(prevWC.y, -prevWC.x);\n\
     }\n\
