@@ -41,7 +41,7 @@ void main()\n\
 #endif\n\
 #endif\n\
 \n\
-    gl_FragColor = color;\n\
+    gl_FragColor = czm_gammaCorrect(color);\n\
     czm_writeLogDepth();\n\
 }\n\
 ";

@@ -35,8 +35,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput)\n\
         discard;\n\
     }\n\
 \n\
+    fragColor = czm_gammaCorrect(fragColor);\n\
     material.emission = fragColor.rgb;\n\
     material.alpha = fragColor.a;\n\
     return material;\n\
-}";
+}\n\
+";
 });

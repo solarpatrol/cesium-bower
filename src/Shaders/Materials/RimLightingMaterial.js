@@ -13,9 +13,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput)\n\
     float d = 1.0 - dot(materialInput.normalEC, normalize(materialInput.positionToEyeEC));\n\
     float s = smoothstep(1.0 - width, 1.0, d);\n\
 \n\
-    material.diffuse = color.rgb;\n\
-    material.emission = rimColor.rgb * s; \n\
-    material.alpha = mix(color.a, rimColor.a, s);\n\
+    vec4 outColor = czm_gammaCorrect(color);\n\
+    vec4 outRimColor = czm_gammaCorrect(rimColor);\n\
+\n\
+    material.diffuse = outColor.rgb;\n\
+    material.emission = outRimColor.rgb * s;\n\
+    material.alpha = mix(outColor.a, outRimColor.a, s);\n\
 \n\
     return material;\n\
 }\n\

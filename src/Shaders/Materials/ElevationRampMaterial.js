@@ -10,6 +10,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)\n\
     czm_material material = czm_getDefaultMaterial(materialInput);\n\
     float scaledHeight = clamp((materialInput.height - minimumHeight) / (maximumHeight - minimumHeight), 0.0, 1.0);\n\
     vec4 rampColor = texture2D(image, vec2(scaledHeight, 0.5));\n\
+    rampColor = czm_gammaCorrect(rampColor);\n\
     material.diffuse = rampColor.rgb;\n\
     material.alpha = rampColor.a;\n\
     return material;\n\
