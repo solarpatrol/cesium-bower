@@ -135,7 +135,11 @@ vec4 sampleAndBlend(\n\
     vec3 color = value.rgb;\n\
     float alpha = value.a;\n\
 \n\
-#ifdef APPLY_GAMMA\n\
+#if !defined(APPLY_GAMMA)\n\
+    vec4 tempColor = czm_gammaCorrect(vec4(color, alpha));\n\
+    color = tempColor.rgb;\n\
+    alpha = tempColor.a;\n\
+#else\n\
     color = pow(color, vec3(textureOneOverGamma));\n\
 #endif\n\
 \n\
@@ -166,10 +170,6 @@ vec4 sampleAndBlend(\n\
 #ifdef APPLY_SATURATION\n\
     color = czm_saturation(color, textureSaturation);\n\
 #endif\n\
-\n\
-    vec4 tempColor = czm_gammaCorrect(vec4(color, alpha));\n\
-    color = tempColor.rgb;\n\
-    alpha = tempColor.a;\n\
 \n\
     float sourceAlpha = alpha * textureAlpha;\n\
     float outAlpha = mix(previousColor.a, 1.0, sourceAlpha);\n\
