@@ -79,6 +79,10 @@ uniform float u_minimumBrightness;\n\
 uniform vec3 u_hsbShift; // Hue, saturation, brightness\n\
 #endif\n\
 \n\
+#ifdef HIGHLIGHT_FILL_TILE\n\
+uniform vec4 u_fillHighlightColor;\n\
+#endif\n\
+\n\
 varying vec3 v_positionMC;\n\
 varying vec3 v_positionEC;\n\
 varying vec3 v_textureCoordinates;\n\
@@ -88,6 +92,7 @@ varying vec3 v_normalEC;\n\
 #ifdef APPLY_MATERIAL\n\
 varying float v_height;\n\
 varying float v_slope;\n\
+varying float v_aspect;\n\
 #endif\n\
 \n\
 #if defined(FOG) || defined(GROUND_ATMOSPHERE)\n\
@@ -196,7 +201,6 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 \n\
 void main()\n\
 {\n\
-\n\
 #ifdef TILE_LIMIT_RECTANGLE\n\
     if (v_textureCoordinates.x < u_cartographicLimitRectangle.x || u_cartographicLimitRectangle.z < v_textureCoordinates.x ||\n\
         v_textureCoordinates.y < u_cartographicLimitRectangle.y || u_cartographicLimitRectangle.w < v_textureCoordinates.y)\n\
@@ -282,6 +286,7 @@ void main()\n\
     materialInput.normalEC = normalize(v_normalEC);\n\
     materialInput.slope = v_slope;\n\
     materialInput.height = v_height;\n\
+    materialInput.aspect = v_aspect;\n\
     czm_material material = czm_getMaterial(materialInput);\n\
     color.xyz = mix(color.xyz, material.diffuse, material.alpha);\n\
 #endif\n\
@@ -306,6 +311,10 @@ void main()\n\
     {\n\
         finalColor = clippingPlanesEdgeColor;\n\
     }\n\
+#endif\n\
+\n\
+#ifdef HIGHLIGHT_FILL_TILE\n\
+    finalColor = vec4(mix(finalColor.rgb, u_fillHighlightColor.rgb, u_fillHighlightColor.a), finalColor.a);\n\
 #endif\n\
 \n\
 #if defined(FOG) || defined(GROUND_ATMOSPHERE)\n\
