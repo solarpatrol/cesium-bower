@@ -22,10 +22,10 @@ brace-expansion@^1.1.7:
     balanced-match "^1.0.0"
     concat-map "0.0.1"
 
-cesium@1.56.0:
-  version "1.56.0"
-  resolved "https://registry.yarnpkg.com/cesium/-/cesium-1.56.0.tgz#e5134d53c09bbd983f6ff830cee447b2d5092d9c"
-  integrity sha512-l1nHSUyWbGn7aM1DdEyJPv9kXRgtDIixFP5ByZgL8vSeVVYMdgidfzgWu7436lrRfVn/w18ubQTOdB/qGOkHig==
+cesium@1.56.1:
+  version "1.56.1"
+  resolved "https://registry.yarnpkg.com/cesium/-/cesium-1.56.1.tgz#3df77861cc115a55a80a6560ddbf1ee06bdc41a5"
+  integrity sha512-0G8KPbiNv+M5u4Nln8zIKHTlGAJtl9JrlDj6R3icXOkdPL9V8KziFScybPerTmrrmfAx5R34EwXOQ8n4NUS1cQ==
   dependencies:
     requirejs "^2.3.2"
 
