@@ -40,6 +40,10 @@ uniform float u_dayTextureOneOverGamma[TEXTURE_UNITS];\n\
 uniform vec4 u_dayTextureCutoutRectangles[TEXTURE_UNITS];\n\
 #endif\n\
 \n\
+#ifdef APPLY_COLOR_TO_ALPHA\n\
+uniform vec4 u_colorsToAlpha[TEXTURE_UNITS];\n\
+#endif\n\
+\n\
 uniform vec4 u_dayTextureTexCoordsRectangle[TEXTURE_UNITS];\n\
 #endif\n\
 \n\
@@ -118,7 +122,8 @@ vec4 sampleAndBlend(\n\
     float textureHue,\n\
     float textureSaturation,\n\
     float textureOneOverGamma,\n\
-    float split)\n\
+    float split,\n\
+    vec4 colorToAlpha)\n\
 {\n\
     // This crazy step stuff sets the alpha to 0.0 if this following condition is true:\n\
     //    tileTextureCoordinates.s < textureCoordinateRectangle.s ||\n\
@@ -139,6 +144,12 @@ vec4 sampleAndBlend(\n\
     vec4 value = texture2D(textureToSample, textureCoordinates);\n\
     vec3 color = value.rgb;\n\
     float alpha = value.a;\n\
+\n\
+#ifdef APPLY_COLOR_TO_ALPHA\n\
+    vec3 colorDiff = abs(color.rgb - colorToAlpha.rgb);\n\
+    colorDiff.r = max(max(colorDiff.r, colorDiff.g), colorDiff.b);\n\
+    alpha = czm_branchFreeTernary(colorDiff.r < colorToAlpha.a, 0.0, alpha);\n\
+#endif\n\
 \n\
 #if !defined(APPLY_GAMMA)\n\
     vec4 tempColor = czm_gammaCorrect(vec4(color, alpha));\n\
@@ -178,8 +189,29 @@ vec4 sampleAndBlend(\n\
 \n\
     float sourceAlpha = alpha * textureAlpha;\n\
     float outAlpha = mix(previousColor.a, 1.0, sourceAlpha);\n\
+    outAlpha += sign(outAlpha) - 1.0;\n\
+\n\
     vec3 outColor = mix(previousColor.rgb * previousColor.a, color, sourceAlpha) / outAlpha;\n\
-    return vec4(outColor, outAlpha);\n\
+\n\
+    // When rendering imagery for a tile in multiple passes,\n\
+    // some GPU/WebGL implementation combinations will not blend fragments in\n\
+    // additional passes correctly if their computation includes an unmasked\n\
+    // divide-by-zero operation,\n\
+    // even if it's not in the output or if the output has alpha zero.\n\
+    //\n\
+    // For example, without sanitization for outAlpha,\n\
+    // this renders without artifacts:\n\
+    //   if (outAlpha == 0.0) { outColor = vec3(0.0); }\n\
+    //\n\
+    // but using czm_branchFreeTernary will cause portions of the tile that are\n\
+    // alpha-zero in the additional pass to render as black instead of blending\n\
+    // with the previous pass:\n\
+    //   outColor = czm_branchFreeTernary(outAlpha == 0.0, vec3(0.0), outColor);\n\
+    //\n\
+    // So instead, sanitize against divide-by-zero,\n\
+    // store this state on the sign of outAlpha, and correct on return.\n\
+\n\
+    return vec4(outColor, max(outAlpha, 0.0));\n\
 }\n\
 \n\
 vec3 colorCorrect(vec3 rgb) {\n\
