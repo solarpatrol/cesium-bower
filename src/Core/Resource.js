@@ -8,7 +8,6 @@ define([
         './defaultValue',
         './defined',
         './defineProperties',
-        './deprecationWarning',
         './DeveloperError',
         './freezeObject',
         './FeatureDetection',
@@ -37,7 +36,6 @@ define([
         defaultValue,
         defined,
         defineProperties,
-        deprecationWarning,
         DeveloperError,
         freezeObject,
         FeatureDetection,
@@ -404,7 +402,8 @@ define([
         })
             .then(function(blob) {
                 return createImageBitmap(blob, {
-                    imageOrientation: 'flipY'
+                    imageOrientation: 'flipY',
+                    premultiplyAlpha: 'none'
                 });
             })
             .then(function(imageBitmap) {
@@ -869,12 +868,6 @@ define([
      * @see {@link http://wiki.commonjs.org/wiki/Promises/A|CommonJS Promises/A}
      */
     Resource.prototype.fetchImage = function (options) {
-        if (typeof options === 'boolean') {
-            deprecationWarning('fetchImage-parameter-change', 'fetchImage now takes an options object in CesiumJS 1.57. Use resource.fetchImage({ preferBlob: true }) instead of resource.fetchImage(true).');
-            options = {
-                preferBlob : options
-            };
-        }
         options = defaultValue(options, defaultValue.EMPTY_OBJECT);
         var preferImageBitmap = defaultValue(options.preferImageBitmap, false);
         var preferBlob = defaultValue(options.preferBlob, false);
@@ -916,7 +909,10 @@ define([
                 }
                 generatedBlob = blob;
                 if (useImageBitmap) {
-                    return Resource._Implementations.createImageBitmapFromBlob(blob, flipY);
+                    return Resource.createImageBitmapFromBlob(blob, {
+                        flipY: flipY,
+                        premultiplyAlpha: false
+                    });
                 }
                 var blobUrl = window.URL.createObjectURL(blob);
                 generatedBlobResource = new Resource({
@@ -1874,7 +1870,10 @@ define([
                     return;
                 }
 
-                return Resource._Implementations.createImageBitmapFromBlob(blob, flipY);
+                return Resource.createImageBitmapFromBlob(blob, {
+                    flipY: flipY,
+                    premultiplyAlpha: false
+                });
             })
             .then(function(imageBitmap) {
                 if (!defined(imageBitmap)) {
@@ -1886,9 +1885,19 @@ define([
             .otherwise(deferred.reject);
     };
 
-    Resource._Implementations.createImageBitmapFromBlob = function(blob, flipY) {
+    /**
+     * Wrapper for createImageBitmap
+     *
+     * @private
+     */
+    Resource.createImageBitmapFromBlob = function(blob, options) {
+        Check.defined('options', options);
+        Check.typeOf.bool('options.flipY', options.flipY);
+        Check.typeOf.bool('options.premultiplyAlpha', options.premultiplyAlpha);
+
         return createImageBitmap(blob, {
-            imageOrientation: flipY ? 'flipY' : 'none'
+            imageOrientation: options.flipY ? 'flipY' : 'none',
+            premultiplyAlpha: options.premultiplyAlpha ? 'premultiply' : 'none'
         });
     };
 

@@ -3,6 +3,7 @@ define(function() {
     'use strict';
     return "uniform vec4 color;\n\
 uniform float glowPower;\n\
+uniform float taperPower;\n\
 \n\
 varying float v_width;\n\
 \n\
@@ -12,6 +13,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput)\n\
 \n\
     vec2 st = materialInput.st;\n\
     float glow = glowPower / abs(st.t - 0.5) - (glowPower / 0.5);\n\
+\n\
+    if (taperPower <= 0.99999) {\n\
+        glow *= min(1.0, taperPower / (0.5 - st.s * 0.5) - (taperPower / 0.5));\n\
+    }\n\
 \n\
     vec4 fragColor;\n\
     fragColor.rgb = max(vec3(glow - 1.0 + color.rgb), color.rgb);\n\
